@@ -1,0 +1,27 @@
+{
+  "name": "nexus",
+  "version": "0.1.0",
+  "private": true,
+  "workspaces": [
+    "apps/*",
+    "packages/*"
+  ],
+  "engines": {
+    "node": ">=24.0.0",
+    "npm": ">=11.0.0"
+  },
+  "scripts": {
+    "dev:web": "npm run dev --workspace @nexus/web",
+    "dev:api": "npm run dev --workspace @nexus/api",
+    "build": "npm run build --workspace @nexus/web && npm run build --workspace @nexus/api",
+    "lint": "npm run lint --workspace @nexus/web && npm run lint --workspace @nexus/api",
+    "test": "npm run test --workspace @nexus/web && npm run test --workspace @nexus/api",
+    "typecheck": "npm run typecheck --workspace @nexus/shared && npm run typecheck --workspace @nexus/web && npm run typecheck --workspace @nexus/api",
+    "format": "prettier --check .",
+    "format:write": "prettier --write ."
+  },
+  "devDependencies": {
+    "prettier": "^3.5.3",
+    "typescript": "^5.8.2"
+  }
+}
