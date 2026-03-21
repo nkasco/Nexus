@@ -1,5 +1,4 @@
 import { Injectable } from '@nestjs/common';
-import type { UserSetting } from '@prisma/client';
 import type { UiPreferences } from '@nexus/shared';
 import { PrismaService } from '../prisma/prisma.service';
 
@@ -17,7 +16,10 @@ const PREFERENCE_KEYS = {
   accent: 'ui.accent',
 } as const;
 
-type StoredPreferenceEntry = Pick<UserSetting, 'key' | 'value'>;
+type StoredPreferenceEntry = {
+  key: string;
+  value: string;
+};
 
 @Injectable()
 export class SettingsService {

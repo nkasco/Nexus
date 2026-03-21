@@ -11,6 +11,7 @@
     "npm": ">=11.0.0"
   },
   "scripts": {
+    "postinstall": "npm run prisma:generate --workspace @nexus/api",
     "dev": "concurrently -k -n API,WEB -c blue,magenta \"npm run dev:api\" \"npm run dev:web\"",
     "dev:web": "npm run dev --workspace @nexus/web",
     "dev:api": "npm run dev --workspace @nexus/api",
