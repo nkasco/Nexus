@@ -2,6 +2,8 @@ import type {
   DashboardResponse,
   DashboardSlug,
   HealthResponse,
+  IntegrationsOverviewResponse,
+  IntegrationSummary,
 } from '@nexus/shared';
 
 export const dashboardSections: {
@@ -229,28 +231,281 @@ export function getSectionMeta(slug: DashboardSlug) {
 export function buildWidgetViews(
   dashboard: DashboardResponse,
   health: HealthResponse | null,
+  integrations: IntegrationsOverviewResponse | null,
 ): WidgetView[] {
   return dashboard.layout.widgets.map((widget) => {
     const presentation = widgetPresentation[widget.id];
+    const dynamic = buildDynamicWidgetPresentation(
+      widget.id,
+      health,
+      integrations,
+    );
     const healthMetric =
       widget.id === 'overview-health' && health
-        ? `${health.status === 'ok' ? 'Healthy' : 'Degraded'}`
-        : presentation?.metric;
+        ? dynamic.metric ?? `${health.status === 'ok' ? 'Healthy' : 'Degraded'}`
+        : dynamic.metric ?? presentation?.metric;
 
     return {
       id: widget.id,
       title: widget.title,
-      eyebrow: presentation?.eyebrow ?? 'Widget',
+      eyebrow: dynamic.eyebrow ?? presentation?.eyebrow ?? 'Widget',
       detail:
+        dynamic.detail ??
         presentation?.detail ??
         'This widget will be wired to a future backend surface.',
       metric: healthMetric,
-      state: presentation?.state ?? 'ready',
-      lines: presentation?.lines,
+      state: dynamic.state ?? presentation?.state ?? 'ready',
+      lines: dynamic.lines ?? presentation?.lines,
       columnSpan: widget.columnSpan,
       rowSpan: widget.rowSpan,
     };
   });
+}
+
+function buildDynamicWidgetPresentation(
+  widgetId: string,
+  health: HealthResponse | null,
+  integrations: IntegrationsOverviewResponse | null,
+): Partial<WidgetView> {
+  if (!integrations) {
+    return {};
+  }
+
+  const proxmox = findIntegration(integrations, 'proxmox');
+  const truenas = findIntegration(integrations, 'truenas');
+  const unifi = findIntegration(integrations, 'unifi');
+  const homeAssistant = findIntegration(integrations, 'home-assistant');
+  const plex = findIntegration(integrations, 'plex');
+  const github = findIntegration(integrations, 'github');
+
+  switch (widgetId) {
+    case 'overview-health':
+      return {
+        detail: `${integrations.totals.assets} normalized assets and ${integrations.totals.metrics} current metrics are active across the read-only integration layer.`,
+        metric: `${integrations.totals.healthyProviders}/${integrations.totals.providers} healthy`,
+        state: integrations.integrations.length > 0 ? 'ready' : 'loading',
+        lines: integrations.integrations
+          .slice(0, 3)
+          .map(
+            (integration) =>
+              `${integration.displayName}: ${integration.headline}`,
+          ),
+      };
+    case 'overview-feed':
+      return {
+        detail:
+          'Recent provider syncs now flow through the normalized Phase 2 ingest pipeline.',
+        metric: `${integrations.integrations.length} providers`,
+        state: integrations.integrations.length > 0 ? 'ready' : 'loading',
+        lines: integrations.integrations
+          .slice()
+          .sort(compareByLastCompletedAt)
+          .slice(0, 3)
+          .map(
+            (integration) =>
+              `${integration.displayName} synced ${formatSyncAge(
+                integration.syncState.lastCompletedAt,
+              )}`,
+          ),
+      };
+    case 'overview-capacity':
+      return {
+        detail:
+          'Phase 2 stores current-state inventory and metric snapshots in SQLite, ready for historical rollups later.',
+        metric: `${integrations.totals.assets} assets`,
+        state: 'ready',
+        lines: [
+          `${integrations.totals.metrics} current metrics retained`,
+          `${integrations.totals.degradedProviders} providers need attention`,
+          `${health?.status === 'ok' ? 'Backend transport healthy' : 'Backend health is degraded'}`,
+        ],
+      };
+    case 'homelab-cluster':
+      return integrationWidget(
+        proxmox,
+        'Compute',
+        'Node, VM, and LXC posture is now sourced from the normalized Proxmox snapshot.',
+        typeMetric(proxmox, 'node', 'nodes'),
+      );
+    case 'homelab-power':
+      return integrationWidget(
+        truenas,
+        'Storage',
+        'Pool and disk health now come from the TrueNAS read-only snapshot layer.',
+        typeMetric(truenas, 'pool', 'pools'),
+      );
+    case 'homelab-network':
+      return integrationWidget(
+        unifi,
+        'Edge',
+        'Gateway, switch, and AP status are now represented through the shared integration model.',
+        typeMetric(unifi, 'access-point', 'APs'),
+      );
+    case 'media-streams':
+      return integrationWidget(
+        plex,
+        'Playback',
+        'Active stream posture and server health now arrive through the Plex snapshot adapter.',
+        typeMetric(plex, 'session', 'sessions'),
+      );
+    case 'media-libraries':
+      return integrationWidget(
+        plex,
+        'Libraries',
+        'Library and server state are stored as normalized Plex assets for later dashboard expansion.',
+        typeMetric(plex, 'library', 'libraries'),
+      );
+    case 'media-actions':
+      return integrationWidget(
+        homeAssistant,
+        'Automation',
+        'Home Assistant entities and automations are read-only in Phase 2 while write controls stay deferred.',
+        typeMetric(homeAssistant, 'automation', 'automations'),
+      );
+    case 'devops-workflows':
+      return integrationWidget(
+        github,
+        'Pipelines',
+        'Workflow runs are now normalized through the GitHub adapter for cross-dashboard use.',
+        typeMetric(github, 'workflow', 'workflows'),
+      );
+    case 'devops-prs':
+      return integrationWidget(
+        github,
+        'Reviews',
+        'Open pull request state is available through the same read-only GitHub integration model.',
+        typeMetric(github, 'pull-request', 'PRs'),
+      );
+    case 'devops-releases':
+      return integrationWidget(
+        github,
+        'Repositories',
+        'Repository activity and release-adjacent status can now share the current-state ingestion pipeline.',
+        typeMetric(github, 'repository', 'repos'),
+      );
+    case 'metrics-window':
+      return {
+        detail:
+          'Provider-specific polling intervals are active now, and this surface will expand into historical filtering in Phase 4.',
+        metric: `${integrations.totals.providers} sources`,
+        state: 'ready',
+        lines: integrations.integrations.map(
+          (integration) =>
+            `${integration.displayName}: every ${integration.pollingIntervalSeconds}s`,
+        ),
+      };
+    case 'metrics-sources':
+      return {
+        detail:
+          'The current ingest pipeline normalizes read-only snapshots from multiple upstream services into one backend model.',
+        metric: `${integrations.totals.metrics} live metrics`,
+        state: integrations.totals.metrics > 0 ? 'ready' : 'loading',
+        lines: integrations.integrations.map(
+          (integration) =>
+            `${integration.displayName}: ${integration.status} with ${integration.syncState.assetCount} assets`,
+        ),
+      };
+    default:
+      return {};
+  }
+}
+
+function integrationWidget(
+  integration: IntegrationSummary | undefined,
+  eyebrow: string,
+  detail: string,
+  metric: string,
+): Partial<WidgetView> {
+  if (!integration) {
+    return {
+      eyebrow,
+      detail,
+      state: 'loading',
+    };
+  }
+
+  return {
+    eyebrow,
+    detail,
+    metric,
+    state: integrationState(integration),
+    lines: [
+      integration.headline,
+      ...integration.highlights.slice(0, 2),
+      `Last sync ${formatSyncAge(integration.syncState.lastCompletedAt)}`,
+    ],
+  };
+}
+
+function integrationState(
+  integration: IntegrationSummary | undefined,
+): WidgetView['state'] {
+  if (!integration) {
+    return 'loading';
+  }
+
+  if (integration.status === 'error') {
+    return 'error';
+  }
+
+  if (integration.status === 'pending' || integration.status === 'syncing') {
+    return 'loading';
+  }
+
+  if (integration.syncState.assetCount === 0) {
+    return 'empty';
+  }
+
+  return 'ready';
+}
+
+function findIntegration(
+  overview: IntegrationsOverviewResponse,
+  provider: IntegrationSummary['provider'],
+) {
+  return overview.integrations.find(
+    (integration) => integration.provider === provider,
+  );
+}
+
+function typeMetric(
+  integration: IntegrationSummary | undefined,
+  type: string,
+  label: string,
+) {
+  const count =
+    integration?.assetsByType.find((entry) => entry.type === type)?.total ?? 0;
+
+  return `${count} ${label}`;
+}
+
+function compareByLastCompletedAt(
+  left: IntegrationSummary,
+  right: IntegrationSummary,
+) {
+  return (
+    new Date(right.syncState.lastCompletedAt ?? 0).getTime() -
+    new Date(left.syncState.lastCompletedAt ?? 0).getTime()
+  );
+}
+
+function formatSyncAge(lastCompletedAt: string | null) {
+  if (!lastCompletedAt) {
+    return 'awaiting first sync';
+  }
+
+  const diffMs = Date.now() - new Date(lastCompletedAt).getTime();
+  const diffMinutes = Math.max(0, Math.round(diffMs / 60_000));
+
+  if (diffMinutes < 1) {
+    return 'just now';
+  }
+
+  if (diffMinutes === 1) {
+    return '1 minute ago';
+  }
+
+  return `${diffMinutes} minutes ago`;
 }
 
 export function createPresetLayout(

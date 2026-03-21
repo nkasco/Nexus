@@ -3,6 +3,7 @@ import type {
   DashboardResponse,
   DashboardSlug,
   HealthResponse,
+  IntegrationsOverviewResponse,
   LoginRequest,
   NotificationListResponse,
   UiPreferences,
@@ -90,6 +91,8 @@ export const api = {
       method: 'POST',
       token,
     }),
+  getIntegrations: (token: string) =>
+    request<IntegrationsOverviewResponse>('/integrations', { token }),
 };
 
 export function getWebSocketUrl(token: string) {

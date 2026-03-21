@@ -16,13 +16,90 @@ model UserSetting {
 }
 
 model Integration {
-  id          String   @id @default(cuid())
-  provider    String
-  displayName String
-  enabled     Boolean  @default(true)
-  status      String   @default("pending")
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  id             String                     @id @default(cuid())
+  provider       String                     @unique
+  displayName    String
+  enabled        Boolean                    @default(true)
+  status         String                     @default("pending")
+  createdAt      DateTime                   @default(now())
+  updatedAt      DateTime                   @updatedAt
+  credentialRefs IntegrationCredentialRef[]
+  syncState      IntegrationSyncState?
+  assets         Asset[]
+  currentMetrics CurrentMetric[]
+}
+
+model IntegrationCredentialRef {
+  id            String      @id @default(cuid())
+  integrationId String
+  key           String
+  label         String
+  value         String
+  sensitive     Boolean     @default(false)
+  createdAt     DateTime    @default(now())
+  updatedAt     DateTime    @updatedAt
+  integration   Integration @relation(fields: [integrationId], references: [id], onDelete: Cascade)
+
+  @@unique([integrationId, key])
+}
+
+model IntegrationSyncState {
+  id                  String      @id @default(cuid())
+  integrationId       String      @unique
+  status              String      @default("pending")
+  lastStartedAt       DateTime?
+  lastCompletedAt     DateTime?
+  lastSuccessAt       DateTime?
+  lastError           String?
+  consecutiveFailures Int         @default(0)
+  durationMs          Int?
+  assetCount          Int         @default(0)
+  metricCount         Int         @default(0)
+  summaryJson         String?
+  createdAt           DateTime    @default(now())
+  updatedAt           DateTime    @updatedAt
+  integration         Integration @relation(fields: [integrationId], references: [id], onDelete: Cascade)
+}
+
+model Asset {
+  id             String          @id @default(cuid())
+  integrationId  String
+  provider       String
+  assetType      String
+  externalId     String
+  name           String
+  status         String          @default("unknown")
+  summary        String
+  metadataJson   String?
+  lastSeenAt     DateTime
+  createdAt      DateTime        @default(now())
+  updatedAt      DateTime        @updatedAt
+  integration    Integration     @relation(fields: [integrationId], references: [id], onDelete: Cascade)
+  currentMetrics CurrentMetric[]
+
+  @@unique([provider, assetType, externalId])
+  @@index([integrationId, assetType])
+}
+
+model CurrentMetric {
+  id            String      @id @default(cuid())
+  integrationId String
+  assetId       String?
+  scopeKey      String      @unique
+  key           String
+  label         String
+  unit          String?
+  valueText     String
+  valueNumber   Float?
+  status        String      @default("unknown")
+  metadataJson  String?
+  observedAt    DateTime
+  createdAt     DateTime    @default(now())
+  updatedAt     DateTime    @updatedAt
+  integration   Integration @relation(fields: [integrationId], references: [id], onDelete: Cascade)
+  asset         Asset?      @relation(fields: [assetId], references: [id], onDelete: Cascade)
+
+  @@index([integrationId, key])
 }
 
 model Dashboard {

@@ -152,25 +152,38 @@ This file should be updated after implementation work so completed items, remain
 
 ### Deliverables
 
-- [ ] Define provider adapter interfaces for inventory, metrics, and actions
-- [ ] Implement integration credential storage and sync-state tracking
-- [ ] Create normalized asset and metric models
-- [ ] Add scheduled polling infrastructure with provider-specific intervals
-- [ ] Add integration status endpoints and error reporting
-- [ ] Implement Proxmox read-only integration
-- [ ] Implement TrueNAS read-only integration
-- [ ] Implement UniFi read-only integration
-- [ ] Implement Home Assistant read-only integration
-- [ ] Implement Plex read-only integration
-- [ ] Implement GitHub and GitHub Actions read-only integration
-- [ ] Store normalized assets and current-state snapshots in SQLite
-- [ ] Broadcast asset and metric changes over WebSocket
+- [x] Define provider adapter interfaces for inventory, metrics, and actions
+- [x] Implement integration credential storage and sync-state tracking
+- [x] Create normalized asset and metric models
+- [x] Add scheduled polling infrastructure with provider-specific intervals
+- [x] Add integration status endpoints and error reporting
+- [x] Implement Proxmox read-only integration
+- [x] Implement TrueNAS read-only integration
+- [x] Implement UniFi read-only integration
+- [x] Implement Home Assistant read-only integration
+- [x] Implement Plex read-only integration
+- [x] Implement GitHub and GitHub Actions read-only integration
+- [x] Store normalized assets and current-state snapshots in SQLite
+- [x] Broadcast asset and metric changes over WebSocket
 
 ### Exit Criteria
 
 - [ ] All target providers can sync successfully with valid credentials
-- [ ] Assets from each provider appear in a normalized backend model
-- [ ] Frontend can display current-state data from multiple providers at once
+- [x] Assets from each provider appear in a normalized backend model
+- [x] Frontend can display current-state data from multiple providers at once
+
+### Phase 2 Notes
+
+- Phase 2 shipped a shared integration contract set, Prisma-backed persistence for credential references, sync state, normalized assets, and current metric snapshots, plus a new authenticated `/integrations` API surface for overview, detail, and manual sync flows.
+- The backend now registers provider adapters for Proxmox, TrueNAS, UniFi, Home Assistant, Plex, and GitHub, seeds integration credential references from environment-variable placeholders, polls each provider on a provider-specific interval, stores the resulting normalized snapshot in SQLite, and broadcasts sync, asset, and metric updates over WebSocket.
+- The current provider adapters use deterministic provider-specific snapshot data so the integration framework, persistence, realtime transport, and frontend can be exercised end to end in this repository without requiring live homelab credentials during development.
+- The existing dashboard shell now consumes the integration overview and renders current-state data across Overview, Home Lab, Media, DevOps, and Metrics widgets instead of only Phase 1 placeholder copy.
+- Shared notification and realtime contracts were extended so integration sync results and warnings surface through the existing notification center and websocket event stream.
+- `.env.example` now documents the Phase 2 provider credential environment variables for future live adapter work and local configuration.
+- `npm run test`, `npm run lint`, and `npm run typecheck` all passed after the Phase 2 work.
+- Playwright validation confirmed the Phase 2 data surfaces render on `/overview` and `/home-lab` when the API and web dev servers are started directly; the existing `apps/web/scripts/dev-server.mjs` port-resolution bug still prevents using the normal web dev wrapper for that validation path.
+- Playwright also surfaced the pre-existing `favicon.ico` 404 in the Next.js dev environment and a Next.js dev warning about cross-origin requests from `127.0.0.1`; neither issue blocks the Phase 2 data flow itself.
+- Follow-up work introduced by this phase includes replacing the deterministic adapter snapshots with live upstream API collection, encrypting credential material at rest instead of storing only references/placeholders, adding operator controls for enabling/disabling integrations and editing credentials, and extending the new normalized data layer into the richer widget set planned for Phase 3.
 
 ## Phase 3: Overview Dashboard and Core Widgets
 

@@ -6,6 +6,8 @@ import { DashboardsController } from './dashboards/dashboards.controller';
 import { DashboardsService } from './dashboards/dashboards.service';
 import { HealthController } from './health/health.controller';
 import { HealthService } from './health/health.service';
+import { IntegrationsController } from './integrations/integrations.controller';
+import { IntegrationsService } from './integrations/integrations.service';
 import { NotificationsController } from './notifications/notifications.controller';
 import { NotificationsService } from './notifications/notifications.service';
 import { PrismaModule } from './prisma/prisma.module';
@@ -19,6 +21,7 @@ import { SettingsService } from './settings/settings.service';
     AuthController,
     DashboardsController,
     HealthController,
+    IntegrationsController,
     NotificationsController,
     SettingsController,
   ],
@@ -27,6 +30,7 @@ import { SettingsService } from './settings/settings.service';
     AuthService,
     DashboardsService,
     HealthService,
+    IntegrationsService,
     NotificationsService,
     RealtimeService,
     SettingsService,

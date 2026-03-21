@@ -4,6 +4,7 @@ import type {
   DashboardResponse,
   DashboardSlug,
   HealthResponse,
+  IntegrationsOverviewResponse,
   NotificationItem,
   RealtimeEvent,
   UiPreferences,
@@ -43,6 +44,8 @@ export function NexusClientApp({ section }: NexusClientAppProps) {
   } = useNotificationsStore();
   const [dashboard, setDashboard] = useState<DashboardResponse | null>(null);
   const [health, setHealth] = useState<HealthResponse | null>(null);
+  const [integrationsOverview, setIntegrationsOverview] =
+    useState<IntegrationsOverviewResponse | null>(null);
   const [errorMessage, setErrorMessage] = useState<string>();
   const [isBootstrapping, setIsBootstrapping] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
@@ -141,6 +144,7 @@ export function NexusClientApp({ section }: NexusClientAppProps) {
   useEffect(() => {
     if (!token) {
       setDashboard(null);
+      setIntegrationsOverview(null);
       return;
     }
 
@@ -149,13 +153,19 @@ export function NexusClientApp({ section }: NexusClientAppProps) {
       setErrorMessage(undefined);
 
       try {
-        const [session, nextPreferences, nextDashboard, nextNotifications] =
-          await Promise.all([
-            api.getSession(token),
-            api.getPreferences(token),
-            api.getDashboard(token, section),
-            api.getNotifications(token),
-          ]);
+        const [
+          session,
+          nextPreferences,
+          nextDashboard,
+          nextNotifications,
+          nextIntegrationsOverview,
+        ] = await Promise.all([
+          api.getSession(token),
+          api.getPreferences(token),
+          api.getDashboard(token, section),
+          api.getNotifications(token),
+          api.getIntegrations(token),
+        ]);
 
         startTransition(() => {
           hydratePreferences(nextPreferences);
@@ -163,6 +173,7 @@ export function NexusClientApp({ section }: NexusClientAppProps) {
             nextNotifications.items,
             nextNotifications.unreadCount,
           );
+          setIntegrationsOverview(nextIntegrationsOverview);
           setSession({
             token,
             user: session.user,
@@ -199,6 +210,13 @@ export function NexusClientApp({ section }: NexusClientAppProps) {
       return;
     }
 
+    const refreshIntegrations = async () => {
+      const nextIntegrationsOverview = await api.getIntegrations(token);
+      startTransition(() => {
+        setIntegrationsOverview(nextIntegrationsOverview);
+      });
+    };
+
     const socket = new WebSocket(getWebSocketUrl(token));
     setWebsocketStatus('connecting');
 
@@ -223,6 +241,15 @@ export function NexusClientApp({ section }: NexusClientAppProps) {
         if (nextDashboard.slug === section) {
           setDashboard(nextDashboard);
         }
+      }
+
+      if (
+        message.type === 'integration.synced' ||
+        message.type === 'integration.sync_failed' ||
+        message.type === 'assets.updated' ||
+        message.type === 'metrics.updated'
+      ) {
+        void refreshIntegrations();
       }
     });
 
@@ -321,12 +348,12 @@ export function NexusClientApp({ section }: NexusClientAppProps) {
         patchPreferences({ theme });
         void savePreferences({ theme });
       }}
-      preferences={preferences}
-      section={section}
-      unreadCount={unreadCount}
-      userName={user.displayName}
-      websocketStatus={websocketStatus}
-      widgets={buildWidgetViews(dashboard, health)}
-    />
-  );
-}
+        preferences={preferences}
+        section={section}
+        unreadCount={unreadCount}
+        userName={user.displayName}
+        websocketStatus={websocketStatus}
+        widgets={buildWidgetViews(dashboard, health, integrationsOverview)}
+      />
+    );
+  }
