@@ -2,7 +2,7 @@ import { NotificationsService } from './notifications.service';
 
 describe('NotificationsService', () => {
   it('records and broadcasts new notifications', () => {
-    const broadcast = jest.fn();
+    const broadcast = vi.fn();
     const service = new NotificationsService({
       broadcast,
     } as never);

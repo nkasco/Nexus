@@ -2,17 +2,17 @@ import { PrismaService } from './prisma.service';
 
 describe('PrismaService', () => {
   it('connects and bootstraps the local sqlite schema on module init', async () => {
-    const execute = jest.fn().mockResolvedValue(0);
-    const transaction = jest.fn().mockImplementation(async (operations) => {
+    const execute = vi.fn().mockResolvedValue(0);
+    const transaction = vi.fn().mockImplementation(async (operations) => {
       await Promise.all(operations);
       return [];
     });
-    const connect = jest.fn().mockResolvedValue(undefined);
+    const connect = vi.fn().mockResolvedValue(undefined);
 
     const service = Object.create(PrismaService.prototype) as PrismaService & {
-      $connect: jest.Mock;
-      $executeRawUnsafe: jest.Mock;
-      $transaction: jest.Mock;
+      $connect: ReturnType<typeof vi.fn>;
+      $executeRawUnsafe: ReturnType<typeof vi.fn>;
+      $transaction: ReturnType<typeof vi.fn>;
     };
 
     service.$connect = connect;

@@ -3,7 +3,7 @@ import { HealthController } from './health.controller';
 describe('HealthController', () => {
   it('keeps method context when the route handler is invoked without the instance', async () => {
     const controller = new HealthController({
-      getStatus: jest.fn().mockResolvedValue({
+      getStatus: vi.fn().mockResolvedValue({
         service: 'nexus-api',
         status: 'ok',
         timestamp: new Date().toISOString(),
@@ -12,7 +12,7 @@ describe('HealthController', () => {
       }),
     } as never);
 
-    const { getHealth } = controller;
+    const getHealth = controller.getHealth.bind(undefined);
     const result = await getHealth();
 
     expect(result.service).toBe('nexus-api');

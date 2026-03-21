@@ -4,7 +4,7 @@ describe('SettingsService', () => {
   it('returns defaults when there are no saved settings', async () => {
     const service = new SettingsService({
       userSetting: {
-        findMany: jest.fn().mockResolvedValue([]),
+        findMany: vi.fn().mockResolvedValue([]),
       },
     } as never);
 
@@ -19,7 +19,7 @@ describe('SettingsService', () => {
   it('reads stored preferences and falls back for malformed values', async () => {
     const service = new SettingsService({
       userSetting: {
-        findMany: jest.fn().mockResolvedValue([
+        findMany: vi.fn().mockResolvedValue([
           { key: 'ui.theme', value: 'light' },
           { key: 'ui.sidebarCollapsed', value: 'true' },
           { key: 'ui.compactMode', value: 'not-a-boolean' },
@@ -37,10 +37,10 @@ describe('SettingsService', () => {
   });
 
   it('persists sanitized preference updates', async () => {
-    const upsert = jest.fn();
+    const upsert = vi.fn();
     const service = new SettingsService({
       userSetting: {
-        findMany: jest.fn().mockResolvedValue([]),
+        findMany: vi.fn().mockResolvedValue([]),
         upsert,
       },
     } as never);

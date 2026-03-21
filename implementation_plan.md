@@ -83,6 +83,7 @@ This file should be updated after implementation work so completed items, remain
 - The `/auth/session` endpoint now resolves its payload directly from the bearer token via `AuthService`, avoiding request-state collisions and returning stable JSON during frontend bootstrap.
 - The settings service now reads Prisma `UserSetting` records through an explicit typed key/value selection, preventing strict TypeScript inference failures in CI and falling back safely when malformed persisted preference values are encountered.
 - Workspace installs and API validation scripts now regenerate the Prisma client automatically, preventing CI or fresh local checkouts from typechecking against stale generated Prisma artifacts.
+- The repository now uses ESLint 9 flat config for both apps, the API test suite runs on Vitest instead of Jest, and the web test environment uses `happy-dom`, which removes the old install-time deprecation warnings from the previous ESLint 8, Jest 29, and `jsdom` dependency chains.
 - Unit tests now cover the new auth, settings, dashboard, notification, and health backend services as well as the key frontend shell, login, and widget components.
 - Follow-up work introduced by this phase includes optional cookie-based auth hardening, conflict handling for simultaneous layout edits across multiple clients, and end-to-end login/dashboard smoke coverage.
 

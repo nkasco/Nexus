@@ -2,7 +2,7 @@ import { AuthController } from './auth.controller';
 
 describe('AuthController', () => {
   it('returns the session payload resolved from the authorization header', () => {
-    const getSessionFromAuthorizationHeader = jest.fn().mockReturnValue({
+    const getSessionFromAuthorizationHeader = vi.fn().mockReturnValue({
       user: {
         username: 'admin',
         displayName: 'Homelab Admin',
@@ -12,11 +12,11 @@ describe('AuthController', () => {
     });
     const controller = new AuthController(
       {
-        login: jest.fn(),
+        login: vi.fn(),
         getSessionFromAuthorizationHeader,
       } as never,
       {
-        record: jest.fn(),
+        record: vi.fn(),
       } as never,
     );
 

@@ -7,11 +7,11 @@
     "dev": "tsc-watch --noClear -p tsconfig.build.json --onSuccess \"node dist/apps/api/src/main.js\"",
     "build": "tsc -p tsconfig.build.json",
     "start": "node dist/apps/api/src/main.js",
-    "lint": "eslint \"src/**/*.ts\"",
+    "lint": "eslint .",
     "pretypecheck": "npm run prisma:generate",
     "typecheck": "tsc --noEmit -p tsconfig.json",
-    "test": "jest --config jest.config.ts --runInBand",
-    "prisma:generate": "prisma generate",
+    "test": "vitest run",
+    "prisma:generate": "PRISMA_HIDE_UPDATE_MESSAGE=1 prisma generate",
     "prisma:migrate:dev": "prisma migrate dev"
   },
   "dependencies": {
@@ -25,21 +25,19 @@
     "ws": "^8.20.0"
   },
   "devDependencies": {
+    "@eslint/js": "^9.39.4",
     "@nestjs/testing": "^11.0.11",
     "@types/express": "^5.0.0",
-    "@types/jest": "^29.5.14",
     "@types/node": "^22.13.10",
     "@types/supertest": "^7.2.0",
     "@types/ws": "^8.18.1",
-    "@typescript-eslint/eslint-plugin": "^8.26.1",
-    "@typescript-eslint/parser": "^8.26.1",
-    "eslint": "^8.57.1",
-    "jest": "^29.7.0",
+    "eslint": "^9.39.4",
     "prisma": "^6.4.1",
     "supertest": "^7.0.0",
-    "ts-jest": "^29.2.6",
     "ts-node": "^10.9.2",
     "tsc-watch": "^7.2.0",
-    "tsx": "^4.19.3"
+    "tsx": "^4.19.3",
+    "typescript-eslint": "^8.57.1",
+    "vitest": "^3.2.4"
   }
 }

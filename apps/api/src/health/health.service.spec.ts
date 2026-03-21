@@ -4,11 +4,11 @@ describe('HealthService', () => {
   it('returns a health payload with component detail', async () => {
     const service = new HealthService(
       {
-        $queryRawUnsafe: jest.fn().mockResolvedValue([{ ok: 1 }]),
+        $queryRawUnsafe: vi.fn().mockResolvedValue([{ ok: 1 }]),
       } as never,
       {
-        isReady: jest.fn().mockReturnValue(true),
-        getConnectedClients: jest.fn().mockReturnValue(2),
+        isReady: vi.fn().mockReturnValue(true),
+        getConnectedClients: vi.fn().mockReturnValue(2),
       } as never,
     );
 

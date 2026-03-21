@@ -5,7 +5,7 @@ describe('DashboardsService', () => {
   it('creates a default dashboard layout when one does not exist', async () => {
     const service = new DashboardsService({
       dashboard: {
-        upsert: jest.fn().mockResolvedValue({
+        upsert: vi.fn().mockResolvedValue({
           slug: 'overview',
           name: 'Overview',
           layout: null,
@@ -23,7 +23,7 @@ describe('DashboardsService', () => {
   it('rejects invalid layout payloads', async () => {
     const service = new DashboardsService({
       dashboard: {
-        upsert: jest.fn(),
+        upsert: vi.fn(),
       },
     } as never);
 
