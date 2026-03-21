@@ -16,6 +16,26 @@ describe('SettingsService', () => {
     });
   });
 
+  it('reads stored preferences and falls back for malformed values', async () => {
+    const service = new SettingsService({
+      userSetting: {
+        findMany: jest.fn().mockResolvedValue([
+          { key: 'ui.theme', value: 'light' },
+          { key: 'ui.sidebarCollapsed', value: 'true' },
+          { key: 'ui.compactMode', value: 'not-a-boolean' },
+          { key: 'ui.accent', value: 'invalid-accent' },
+        ]),
+      },
+    } as never);
+
+    await expect(service.getPreferences()).resolves.toEqual({
+      theme: 'light',
+      sidebarCollapsed: true,
+      compactMode: false,
+      accent: 'aurora',
+    });
+  });
+
   it('persists sanitized preference updates', async () => {
     const upsert = jest.fn();
     const service = new SettingsService({

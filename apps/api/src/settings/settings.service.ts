@@ -1,4 +1,5 @@
 import { Injectable } from '@nestjs/common';
+import type { UserSetting } from '@prisma/client';
 import type { UiPreferences } from '@nexus/shared';
 import { PrismaService } from '../prisma/prisma.service';
 
@@ -16,21 +17,29 @@ const PREFERENCE_KEYS = {
   accent: 'ui.accent',
 } as const;
 
+type StoredPreferenceEntry = Pick<UserSetting, 'key' | 'value'>;
+
 @Injectable()
 export class SettingsService {
   constructor(private readonly prisma: PrismaService) {}
 
   async getPreferences(): Promise<UiPreferences> {
-    const entries = await this.prisma.userSetting.findMany({
-      where: {
-        key: {
-          in: Object.values(PREFERENCE_KEYS),
+    const entries: StoredPreferenceEntry[] = await this.prisma.userSetting.findMany(
+      {
+        select: {
+          key: true,
+          value: true,
+        },
+        where: {
+          key: {
+            in: Object.values(PREFERENCE_KEYS),
+          },
         },
       },
-    });
+    );
 
-    const settingsMap = new Map(
-      entries.map((entry) => [entry.key, entry.value]),
+    const settingsMap = new Map<string, string>(
+      entries.map(({ key, value }) => [key, value] as const),
     );
 
     return {
@@ -73,7 +82,7 @@ export class SettingsService {
 
   private sanitize(updates: Partial<UiPreferences>): Partial<UiPreferences> {
     return {
-      ...(updates.theme && ['system', 'light', 'dark'].includes(updates.theme)
+      ...(this.isThemePreference(updates.theme)
         ? { theme: updates.theme }
         : {}),
       ...(typeof updates.sidebarCollapsed === 'boolean'
@@ -82,7 +91,7 @@ export class SettingsService {
       ...(typeof updates.compactMode === 'boolean'
         ? { compactMode: updates.compactMode }
         : {}),
-      ...(updates.accent && ['aurora', 'graphite'].includes(updates.accent)
+      ...(this.isAccentPreference(updates.accent)
         ? { accent: updates.accent }
         : {}),
     };
@@ -97,11 +106,19 @@ export class SettingsService {
   }
 
   private readBoolean(value: string | undefined, fallback: boolean) {
-    return value ? value === 'true' : fallback;
+    if (value === 'true') {
+      return true;
+    }
+
+    if (value === 'false') {
+      return false;
+    }
+
+    return fallback;
   }
 
   private readTheme(value: string | undefined): UiPreferences['theme'] {
-    if (value === 'light' || value === 'dark' || value === 'system') {
+    if (this.isThemePreference(value)) {
       return value;
     }
 
@@ -109,10 +126,18 @@ export class SettingsService {
   }
 
   private readAccent(value: string | undefined): UiPreferences['accent'] {
-    if (value === 'aurora' || value === 'graphite') {
+    if (this.isAccentPreference(value)) {
       return value;
     }
 
     return DEFAULT_PREFERENCES.accent;
+  }
+
+  private isThemePreference(value: unknown): value is UiPreferences['theme'] {
+    return value === 'light' || value === 'dark' || value === 'system';
+  }
+
+  private isAccentPreference(value: unknown): value is UiPreferences['accent'] {
+    return value === 'aurora' || value === 'graphite';
   }
 }

@@ -81,8 +81,60 @@ This file should be updated after implementation work so completed items, remain
 - The API dev and start scripts now target the actual compiled entrypoint under `dist/apps/api/src/main.js`, aligning local development with the emitted TypeScript build layout.
 - Prisma now bootstraps the local SQLite tables needed for Phase 1 on startup, so a fresh development database can serve login, settings, and dashboard requests without a separate manual migration step.
 - The `/auth/session` endpoint now resolves its payload directly from the bearer token via `AuthService`, avoiding request-state collisions and returning stable JSON during frontend bootstrap.
+- The settings service now reads Prisma `UserSetting` records through an explicit typed key/value selection, preventing strict TypeScript inference failures in CI and falling back safely when malformed persisted preference values are encountered.
 - Unit tests now cover the new auth, settings, dashboard, notification, and health backend services as well as the key frontend shell, login, and widget components.
 - Follow-up work introduced by this phase includes optional cookie-based auth hardening, conflict handling for simultaneous layout edits across multiple clients, and end-to-end login/dashboard smoke coverage.
+
+## Phase 1.5: UI Refinement and Visual Cohesion
+
+### Objectives
+
+- Refine the Phase 1 shell so it feels closer to a clean macOS workspace blended with Notion's clarity and restraint.
+- Recenter the visual system around a dark-mode-first experience instead of the current pale, washed-out presentation.
+- Rethink the current blue-leaning theme treatment so both theme modes and shared UI states use a more intentional, better-balanced palette.
+- Reduce the current glass-heavy, high-contrast dashboard styling in favor of calmer surfaces, stronger information hierarchy, and more native-feeling controls.
+- Establish a reusable visual language that later data-rich phases can build on without another broad UI redesign.
+
+### Deliverables
+
+- [ ] Audit the current shell, navigation, widget grid, and notification center against the target visual direction and document the specific gaps to close
+- [ ] Redefine the core design tokens for background, surface, border, typography, spacing, radius, shadow, and motion so the interface reads as darker, calmer, and more desktop-native
+- [ ] Establish a dark-mode-first color system with graphite, slate, ink, and muted blue-gray tones inspired by macOS dark surfaces and Notion's restrained contrast
+- [ ] Rework the entire theme palette for both dark and light modes so neither mode defaults to a blue cast and all neutrals, accents, and semantic states feel deliberate
+- [ ] Replace the current heavy glassmorphism treatment with a cleaner layered surface system that combines macOS softness with Notion-like editorial simplicity
+- [ ] Remove the current washed-out light gray gradients and replace them with richer dark surfaces, subtle depth separation, and more intentional accent restraint
+- [ ] Refine the page canvas, content width, and section spacing so the layout feels less inflated and more intentionally structured
+- [ ] Redesign the sidebar to feel more like a native desktop source list, with clearer active states, quieter inactive states, and better collapsed behavior
+- [ ] Simplify the top shell header into a more focused workspace control bar with improved alignment, clearer grouping, and less visual competition between controls
+- [ ] Introduce a more cohesive widget/card system with consistent header structure, metadata styling, state treatments, and content rhythm
+- [ ] Revisit the core component language itself, including card shapes, control chrome, panel nesting, chip usage, and grouping patterns, so the UI does not rely on the current repeated rounded-pill treatment
+- [ ] Restyle form controls, selects, buttons, toggles, and status pills to feel more macOS-native while preserving the existing preference and dashboard actions
+- [ ] Rework typography scale and copy presentation so titles, labels, helper text, and widget details feel closer to a polished productivity app than a futuristic ops console
+- [ ] Polish the notification center with better hierarchy, spacing, and read/unread treatment so it matches the refined shell instead of reading like an overlay from a different theme
+- [ ] Add or standardize icon usage where it improves scanability, especially in navigation, widget metadata, and shell actions
+- [ ] Tighten transitions, hover states, focus states, and loading behavior so interactions feel deliberate and subtle rather than decorative
+- [ ] Validate the revised shell at desktop and smaller breakpoints with Playwright-assisted UI review and capture updated screenshots for implementation notes
+
+### Exit Criteria
+
+- [ ] The authenticated shell presents a visually cohesive dark-mode macOS-plus-Notion direction across the sidebar, header, widgets, and notification center
+- [ ] The revised palette feels intentional across both theme modes, with no pervasive blue tint unless it is used selectively as an accent or semantic state
+- [ ] Theme, density, layout preset, and notification interactions still work after the visual refactor without introducing behavior regressions
+- [ ] The design token system is stable enough that later phases can add real widgets and charts without inventing one-off styling rules
+- [ ] Playwright-assisted review confirms the refined shell is visually consistent at the main supported viewport sizes
+
+### Phase 1.5 Notes
+
+- This phase is intentionally a visual refinement pass, not a feature expansion phase; it should improve the perceived quality of the existing shell before provider integrations and richer widgets arrive.
+- The current implementation already has a strong shell foundation, but it leans more toward glossy futuristic dashboard styling than the cleaner desktop-productivity blend described in the specification.
+- The target outcome is a dark-mode-first UI that combines macOS-inspired materials, spacing, and controls with Notion-like typography, calm hierarchy, and editorial restraint.
+- A live Playwright review of `/overview` was completed after the initial browser-session issue was cleared, and it confirmed that the current shell already has the right high-level information architecture but needs calmer visual treatment.
+- Specific UI issues observed in the live shell include colors that skew too pale and silvery, oversized corner radii, heavy frosted gradients, too many pill-shaped containers in the header, weak differentiation between primary and secondary controls, and widget cards that feel tall and sparse instead of compact and editorial.
+- The current theme system also applies a noticeable blue cast across large parts of the interface, which makes both modes feel less neutral and less premium than intended; Phase 1.5 should treat palette design as a first-class redesign task rather than a small token tweak.
+- The sidebar layout is structurally good, but its current presentation reads more like a concept dashboard than a native desktop source list; Phase 1.5 should make the active item, icon treatment, spacing, and account panel feel more grounded and utilitarian.
+- The header control cluster currently competes with the page title for attention; the refinement pass should reduce visual noise, improve grouping, and make settings feel like lightweight toolbar controls rather than feature cards.
+- The visual refresh should prioritize dark graphite and ink surfaces with restrained cool accents, avoiding bright white panels, milky overlays, or neon color pops unless they serve a state or action cue.
+- This phase should not assume the existing component forms are correct; if cards, chips, select wrappers, or grouped controls need different shapes or hierarchy to achieve the target look, the redesign should update those patterns instead of only recoloring them.
 
 ## Phase 2: Integration Framework and Read-Only Data
 
