@@ -9,10 +9,10 @@ describe('SettingsService', () => {
     } as never);
 
     await expect(service.getPreferences()).resolves.toEqual({
-      theme: 'system',
+      theme: 'dark',
       sidebarCollapsed: false,
       compactMode: false,
-      accent: 'aurora',
+      accent: 'graphite',
     });
   });
 
@@ -32,7 +32,7 @@ describe('SettingsService', () => {
       theme: 'light',
       sidebarCollapsed: true,
       compactMode: false,
-      accent: 'aurora',
+      accent: 'graphite',
     });
   });
 
@@ -55,7 +55,7 @@ describe('SettingsService', () => {
       theme: 'dark',
       sidebarCollapsed: true,
       compactMode: true,
-      accent: 'aurora',
+      accent: 'graphite',
     });
     expect(upsert).toHaveBeenCalledTimes(4);
   });

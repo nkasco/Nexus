@@ -5,10 +5,10 @@ import { create } from 'zustand';
 import { createJSONStorage, persist } from 'zustand/middleware';
 
 const defaultPreferences: UiPreferences = {
-  theme: 'system',
+  theme: 'dark',
   sidebarCollapsed: false,
   compactMode: false,
-  accent: 'aurora',
+  accent: 'graphite',
 };
 
 interface PreferencesState extends UiPreferences {

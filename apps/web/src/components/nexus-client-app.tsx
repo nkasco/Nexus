@@ -262,8 +262,8 @@ export function NexusClientApp({ section }: NexusClientAppProps) {
 
   if (isBootstrapping || !dashboard) {
     return (
-      <main className="flex min-h-screen items-center justify-center text-[color:var(--text-main)]">
-        <div className="rounded-[28px] border border-white/12 bg-[color:var(--shell-surface)] px-6 py-5 text-sm text-[color:var(--text-subtle)] shadow-[0_24px_80px_rgba(8,15,30,0.18)]">
+      <main className="flex min-h-screen items-center justify-center px-6 text-[color:var(--text-main)]">
+        <div className="surface-panel px-6 py-5 text-sm text-[color:var(--text-subtle)]">
           Restoring the authenticated shell...
         </div>
       </main>

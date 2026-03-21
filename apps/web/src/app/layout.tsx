@@ -12,7 +12,12 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" suppressHydrationWarning>
+    <html
+      data-accent="graphite"
+      data-theme="dark"
+      lang="en"
+      suppressHydrationWarning
+    >
       <body>{children}</body>
     </html>
   );

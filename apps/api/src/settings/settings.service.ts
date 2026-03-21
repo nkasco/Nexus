@@ -3,10 +3,10 @@ import type { UiPreferences } from '@nexus/shared';
 import { PrismaService } from '../prisma/prisma.service';
 
 const DEFAULT_PREFERENCES: UiPreferences = {
-  theme: 'system',
+  theme: 'dark',
   sidebarCollapsed: false,
   compactMode: false,
-  accent: 'aurora',
+  accent: 'graphite',
 };
 
 const PREFERENCE_KEYS = {
@@ -26,8 +26,8 @@ export class SettingsService {
   constructor(private readonly prisma: PrismaService) {}
 
   async getPreferences(): Promise<UiPreferences> {
-    const entries: StoredPreferenceEntry[] = await this.prisma.userSetting.findMany(
-      {
+    const entries: StoredPreferenceEntry[] =
+      await this.prisma.userSetting.findMany({
         select: {
           key: true,
           value: true,
@@ -37,8 +37,7 @@ export class SettingsService {
             in: Object.values(PREFERENCE_KEYS),
           },
         },
-      },
-    );
+      });
 
     const settingsMap = new Map<string, string>(
       entries.map(({ key, value }) => [key, value] as const),

@@ -7,10 +7,10 @@ import { render, screen } from '@testing-library/react';
 import { AppShell } from './app-shell';
 
 const preferences: UiPreferences = {
-  theme: 'system',
+  theme: 'dark',
   sidebarCollapsed: false,
   compactMode: false,
-  accent: 'aurora',
+  accent: 'graphite',
 };
 
 const dashboard: DashboardResponse = {
@@ -44,7 +44,7 @@ const notifications: NotificationItem[] = [
 
 describe('AppShell', () => {
   it('renders navigation, controls, and widget content', () => {
-    render(
+    const { container, getByTestId } = render(
       <AppShell
         dashboard={dashboard}
         health={{
@@ -91,8 +91,26 @@ describe('AppShell', () => {
     expect(
       screen.getByRole('heading', { level: 2, name: 'Overview' }),
     ).toBeInTheDocument();
+    expect(screen.getByText('Workspace Controls')).toBeInTheDocument();
     expect(screen.getByText('Fleet Health')).toBeInTheDocument();
     expect(screen.getByText('1 unread item')).toBeInTheDocument();
     expect(screen.getByText('Core platform online')).toBeInTheDocument();
+    expect(
+      screen.getByRole('button', { name: 'Collapse sidebar' }),
+    ).toBeInTheDocument();
+    expect(getByTestId('app-sidebar')).toHaveClass(
+      'lg:w-[292px]',
+      'pl-0',
+      'pr-0',
+      'rounded-none',
+      'border-l-0',
+      'border-t-0',
+      'border-b-0',
+    );
+    expect(getByTestId('nav-link-overview')).toHaveClass(
+      'px-3',
+      'rounded-[14px]',
+    );
+    expect(container.firstChild).toHaveClass('pl-0', 'pt-0');
   });
 });

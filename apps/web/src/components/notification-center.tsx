@@ -10,6 +10,17 @@ interface NotificationCenterProps {
   onMarkAllRead: () => void;
 }
 
+function severityTone(severity: NotificationItem['severity']) {
+  switch (severity) {
+    case 'warning':
+      return 'border-l-[color:var(--warning-strong)]';
+    case 'success':
+      return 'border-l-[color:var(--success-strong)]';
+    default:
+      return 'border-l-[color:var(--accent-strong)]';
+  }
+}
+
 export function NotificationCenter({
   isOpen,
   unreadCount,
@@ -19,23 +30,22 @@ export function NotificationCenter({
   return (
     <aside
       className={clsx(
-        'fixed right-4 top-4 z-30 w-[min(92vw,360px)] rounded-[28px] border border-white/18 bg-[color:var(--shell-surface)] p-5 shadow-[0_24px_80px_rgba(6,14,28,0.24)] backdrop-blur-xl transition duration-300',
+        'surface-panel fixed right-4 top-4 z-30 w-[min(94vw,380px)] px-4 py-4 transition duration-200 sm:right-6 sm:top-6',
         isOpen
           ? 'translate-y-0 opacity-100'
-          : 'pointer-events-none -translate-y-4 opacity-0',
+          : 'pointer-events-none translate-y-2 opacity-0',
       )}
+      style={{ background: 'var(--shell-surface)' }}
     >
-      <div className="flex items-center justify-between gap-3">
+      <div className="flex items-center justify-between gap-3 border-b border-[color:var(--border-soft)] pb-4">
         <div>
-          <p className="text-xs uppercase tracking-[0.3em] text-[color:var(--text-subtle)]">
-            Notification Center
-          </p>
-          <h2 className="mt-2 text-lg font-semibold text-[color:var(--text-main)]">
+          <p className="eyebrow-label">Notification Center</p>
+          <h2 className="mt-2 text-xl font-semibold tracking-[-0.03em] text-[color:var(--text-main)]">
             {unreadCount} unread
           </h2>
         </div>
         <button
-          className="rounded-full border border-white/12 px-3 py-2 text-xs font-medium text-[color:var(--text-subtle)] transition hover:border-white/25 hover:text-[color:var(--text-main)]"
+          className="rounded-[14px] border border-[color:var(--border-soft)] bg-[color:var(--panel-subtle)] px-3 py-2 text-xs font-medium uppercase tracking-[0.12em] text-[color:var(--text-subtle)] transition hover:border-[color:var(--border-strong)] hover:bg-[color:var(--panel-muted)] hover:text-[color:var(--text-main)]"
           onClick={onMarkAllRead}
           type="button"
         >
@@ -43,14 +53,13 @@ export function NotificationCenter({
         </button>
       </div>
 
-      <div className="mt-5 space-y-3">
+      <div className="mt-4 max-h-[70vh] space-y-3 overflow-auto pr-1">
         {items.map((item) => (
           <article
             className={clsx(
-              'rounded-[22px] border p-4',
-              item.read
-                ? 'border-white/10 bg-white/5'
-                : 'border-[color:var(--accent-soft)]/35 bg-[color:var(--accent-soft)]/12',
+              'rounded-[18px] border border-[color:var(--border-soft)] border-l-2 bg-[color:var(--panel-subtle)] p-4',
+              severityTone(item.severity),
+              !item.read && 'bg-[color:var(--panel-muted)]',
             )}
             key={item.id}
           >
@@ -63,11 +72,11 @@ export function NotificationCenter({
                   {item.message}
                 </p>
               </div>
-              <span className="rounded-full border border-white/10 px-2 py-1 text-[10px] uppercase tracking-[0.2em] text-[color:var(--text-subtle)]">
+              <span className="rounded-full border border-[color:var(--border-soft)] px-2 py-1 text-[10px] font-medium uppercase tracking-[0.16em] text-[color:var(--text-muted)]">
                 {item.source}
               </span>
             </div>
-            <p className="mt-3 text-xs uppercase tracking-[0.2em] text-[color:var(--text-subtle)]">
+            <p className="mt-3 text-xs uppercase tracking-[0.16em] text-[color:var(--text-muted)]">
               {new Date(item.createdAt).toLocaleTimeString([], {
                 hour: 'numeric',
                 minute: '2-digit',

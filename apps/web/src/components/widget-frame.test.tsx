@@ -32,4 +32,18 @@ describe('WidgetFrame', () => {
     expect(screen.getByText('Syncing')).toBeInTheDocument();
     expect(screen.getByText(/preparing this widget/i)).toBeInTheDocument();
   });
+
+  it('renders error fallback copy for failed widgets', () => {
+    render(
+      <WidgetFrame
+        detail="Failure detail"
+        eyebrow="Error"
+        state="error"
+        title="Adapter sync"
+      />,
+    );
+
+    expect(screen.getByText('Needs attention')).toBeInTheDocument();
+    expect(screen.getByText(/did not complete cleanly/i)).toBeInTheDocument();
+  });
 });

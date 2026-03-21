@@ -20,57 +20,75 @@ export function LoginPanel({
 
   return (
     <main className="relative flex min-h-screen items-center justify-center overflow-hidden px-6 py-10 text-[color:var(--text-main)]">
-      <div className="absolute inset-0 bg-[radial-gradient(circle_at_top,_rgba(255,255,255,0.32),transparent_28%),radial-gradient(circle_at_bottom_right,_rgba(111,172,255,0.18),transparent_32%)]" />
-      <section className="relative z-10 grid w-full max-w-5xl gap-6 rounded-[36px] border border-white/30 bg-[color:var(--shell-surface)] p-6 shadow-[0_30px_90px_rgba(9,17,31,0.22)] backdrop-blur-xl lg:grid-cols-[1.2fr_0.8fr]">
-        <div className="rounded-[30px] border border-white/16 bg-[linear-gradient(135deg,rgba(255,255,255,0.2),rgba(255,255,255,0.06))] p-8">
-          <p className="text-xs uppercase tracking-[0.38em] text-[color:var(--text-subtle)]">
-            Nexus
-          </p>
-          <h1 className="mt-5 max-w-lg text-4xl font-semibold tracking-tight text-[color:var(--text-main)]">
-            One control surface for the whole homelab.
-          </h1>
-          <p className="mt-5 max-w-xl text-base leading-7 text-[color:var(--text-subtle)]">
-            Phase 1 brings the authenticated shell online with saved layout
-            presets, realtime transport, operator notifications, and a shared
-            visual system for every dashboard route.
-          </p>
+      <section className="surface-panel relative z-10 grid w-full max-w-6xl gap-5 overflow-hidden p-5 lg:grid-cols-[1.1fr_0.78fr] lg:p-6">
+        <div className="surface-card flex flex-col justify-between p-7 sm:p-8">
+          <div>
+            <div className="flex items-center gap-3">
+              <div className="flex h-11 w-11 items-center justify-center rounded-[16px] border border-[color:var(--border-soft)] bg-[color:var(--panel-subtle)] text-base font-semibold">
+                N
+              </div>
+              <div>
+                <p className="eyebrow-label">Nexus</p>
+                <p className="mt-1 text-sm text-[color:var(--text-subtle)]">
+                  Operator dashboard
+                </p>
+              </div>
+            </div>
 
-          <div className="mt-8 grid gap-4 md:grid-cols-3">
-            <article className="rounded-[24px] border border-white/14 bg-white/8 p-4">
-              <p className="text-sm font-medium">Realtime ready</p>
+            <h1 className="mt-8 max-w-xl text-4xl font-semibold tracking-[-0.06em] sm:text-5xl">
+              Dark, calm, and ready to run the whole homelab.
+            </h1>
+            <p className="mt-5 max-w-2xl text-base leading-8 text-[color:var(--text-subtle)]">
+              Phase 1.5 reshapes the shell into a more grounded workspace with
+              cleaner hierarchy, quieter controls, and a darker visual system
+              that can scale into the real data-rich dashboard.
+            </p>
+          </div>
+
+          <div className="mt-8 grid gap-3 md:grid-cols-3">
+            <article className="surface-muted p-4">
+              <p className="eyebrow-label">Realtime</p>
+              <p className="mt-3 text-sm font-medium">Live shell state</p>
               <p className="mt-2 text-sm leading-6 text-[color:var(--text-subtle)]">
-                Health pings and notification broadcasts land without a full
-                refresh.
+                Health pulses and notifications update without a full refresh.
               </p>
             </article>
-            <article className="rounded-[24px] border border-white/14 bg-white/8 p-4">
-              <p className="text-sm font-medium">Saved preferences</p>
+            <article className="surface-muted p-4">
+              <p className="eyebrow-label">Preferences</p>
+              <p className="mt-3 text-sm font-medium">Saved operator setup</p>
               <p className="mt-2 text-sm leading-6 text-[color:var(--text-subtle)]">
                 Theme, layout density, and shell posture persist through the
                 API.
               </p>
             </article>
-            <article className="rounded-[24px] border border-white/14 bg-white/8 p-4">
-              <p className="text-sm font-medium">Route foundation</p>
+            <article className="surface-muted p-4">
+              <p className="eyebrow-label">Routes</p>
+              <p className="mt-3 text-sm font-medium">Shared foundation</p>
               <p className="mt-2 text-sm leading-6 text-[color:var(--text-subtle)]">
-                Overview, Home Lab, Media, DevOps, Metrics, and Alerts all share
-                the same core shell.
+                Overview, Home Lab, Media, DevOps, Metrics, and Alerts all land
+                in one shell.
               </p>
             </article>
           </div>
         </div>
 
-        <div className="rounded-[30px] border border-white/16 bg-[color:var(--panel-strong)] p-8">
-          <div className="flex items-center justify-between">
+        <div className="surface-card p-7 sm:p-8">
+          <div className="flex items-start justify-between gap-3">
             <div>
-              <p className="text-xs uppercase tracking-[0.3em] text-[color:var(--text-subtle)]">
-                Admin Access
-              </p>
-              <h2 className="mt-3 text-2xl font-semibold">
+              <p className="eyebrow-label">Admin Access</p>
+              <h2 className="mt-3 text-3xl font-semibold tracking-[-0.05em]">
                 Enter the dashboard
               </h2>
             </div>
-            <span className="rounded-full border border-white/12 bg-white/8 px-3 py-1 text-xs uppercase tracking-[0.2em] text-[color:var(--text-subtle)]">
+            <span className="status-badge">
+              <span
+                className="status-dot"
+                style={{
+                  background: apiHealthy
+                    ? 'var(--success-strong)'
+                    : 'var(--danger-strong)',
+                }}
+              />
               {apiHealthy ? 'API healthy' : 'API unavailable'}
             </span>
           </div>
@@ -87,7 +105,7 @@ export function LoginPanel({
                 Username
               </span>
               <input
-                className="w-full rounded-2xl border border-white/12 bg-white/8 px-4 py-3 text-base text-[color:var(--text-main)] outline-none transition focus:border-[color:var(--accent-strong)]"
+                className="shell-input"
                 name="username"
                 onChange={(event) => setUsername(event.target.value)}
                 value={username}
@@ -99,7 +117,7 @@ export function LoginPanel({
                 Password
               </span>
               <input
-                className="w-full rounded-2xl border border-white/12 bg-white/8 px-4 py-3 text-base text-[color:var(--text-main)] outline-none transition focus:border-[color:var(--accent-strong)]"
+                className="shell-input"
                 name="password"
                 onChange={(event) => setPassword(event.target.value)}
                 type="password"
@@ -108,13 +126,21 @@ export function LoginPanel({
             </label>
 
             {errorMessage ? (
-              <p className="rounded-2xl border border-rose-300/25 bg-rose-500/12 px-4 py-3 text-sm text-rose-100">
+              <p
+                className="rounded-[16px] border px-4 py-3 text-sm text-[color:var(--text-main)]"
+                style={{
+                  background:
+                    'color-mix(in srgb, var(--danger-strong) 12%, transparent)',
+                  borderColor:
+                    'color-mix(in srgb, var(--danger-strong) 32%, transparent)',
+                }}
+              >
                 {errorMessage}
               </p>
             ) : null}
 
             <button
-              className="w-full rounded-2xl bg-[linear-gradient(135deg,var(--accent-strong),var(--accent-soft))] px-4 py-3 text-sm font-semibold text-slate-950 transition hover:brightness-105 disabled:cursor-not-allowed disabled:opacity-70"
+              className="flex h-12 w-full items-center justify-center rounded-[16px] border border-[color:var(--accent-outline)] bg-[color:var(--accent-strong)] px-4 text-sm font-semibold text-[color:var(--accent-contrast)] transition hover:brightness-105 disabled:cursor-not-allowed disabled:opacity-70"
               disabled={isSubmitting}
               type="submit"
             >
@@ -122,10 +148,13 @@ export function LoginPanel({
             </button>
           </form>
 
-          <p className="mt-6 text-sm leading-6 text-[color:var(--text-subtle)]">
-            The default development credential pair is controlled through
-            `ADMIN_USERNAME` and `ADMIN_PASSWORD` in the API environment.
-          </p>
+          <div className="mt-6 rounded-[16px] border border-[color:var(--border-soft)] bg-[color:var(--panel-subtle)] px-4 py-4">
+            <p className="eyebrow-label">Development Note</p>
+            <p className="mt-3 text-sm leading-6 text-[color:var(--text-subtle)]">
+              The default development credential pair is controlled through
+              `ADMIN_USERNAME` and `ADMIN_PASSWORD` in the API environment.
+            </p>
+          </div>
         </div>
       </section>
     </main>
