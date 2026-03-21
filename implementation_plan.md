@@ -84,6 +84,7 @@ This file should be updated after implementation work so completed items, remain
 - The settings service now reads Prisma `UserSetting` records through an explicit typed key/value selection, preventing strict TypeScript inference failures in CI and falling back safely when malformed persisted preference values are encountered.
 - Workspace installs and API validation scripts now regenerate the Prisma client automatically, preventing CI or fresh local checkouts from typechecking against stale generated Prisma artifacts.
 - The repository now uses ESLint 9 flat config for both apps, the API test suite runs on Vitest instead of Jest, and the web test environment uses `happy-dom`, which removes the old install-time deprecation warnings from the previous ESLint 8, Jest 29, and `jsdom` dependency chains.
+- The web development server now probes for the next free port when `WEB_PORT` or the default `3000` is already occupied, and unit tests cover that fallback so the consolidated `npm run dev` workflow does not fail just because another local process is already bound.
 - Unit tests now cover the new auth, settings, dashboard, notification, and health backend services as well as the key frontend shell, login, and widget components.
 - Follow-up work introduced by this phase includes optional cookie-based auth hardening, conflict handling for simultaneous layout edits across multiple clients, and end-to-end login/dashboard smoke coverage.
 
@@ -95,6 +96,7 @@ This file should be updated after implementation work so completed items, remain
 - Recenter the visual system around a dark-mode-first experience instead of the current pale, washed-out presentation.
 - Rethink the current blue-leaning theme treatment so both theme modes and shared UI states use a more intentional, better-balanced palette.
 - Reduce the current glass-heavy, high-contrast dashboard styling in favor of calmer surfaces, stronger information hierarchy, and more native-feeling controls.
+- Shift the shell away from a glossy “control center” aesthetic toward a darker, flatter, denser desktop workspace more in line with the provided reference.
 - Establish a reusable visual language that later data-rich phases can build on without another broad UI redesign.
 
 ### Deliverables
@@ -105,11 +107,14 @@ This file should be updated after implementation work so completed items, remain
 - [ ] Rework the entire theme palette for both dark and light modes so neither mode defaults to a blue cast and all neutrals, accents, and semantic states feel deliberate
 - [ ] Replace the current heavy glassmorphism treatment with a cleaner layered surface system that combines macOS softness with Notion-like editorial simplicity
 - [ ] Remove the current washed-out light gray gradients and replace them with richer dark surfaces, subtle depth separation, and more intentional accent restraint
+- [ ] Replace the current glossy shell framing with flatter, matte, low-glare surfaces and darker neutral backgrounds closer to a desktop productivity app
 - [ ] Refine the page canvas, content width, and section spacing so the layout feels less inflated and more intentionally structured
-- [ ] Redesign the sidebar to feel more like a native desktop source list, with clearer active states, quieter inactive states, and better collapsed behavior
-- [ ] Simplify the top shell header into a more focused workspace control bar with improved alignment, clearer grouping, and less visual competition between controls
+- [ ] Redesign the sidebar to feel more like a dense desktop source list, with tighter vertical rhythm, quieter separators, clearer active rows, and reduced ornamental chrome
+- [ ] Simplify the top shell header into a lighter workspace toolbar so content leads the page instead of the header controls dominating it
 - [ ] Introduce a more cohesive widget/card system with consistent header structure, metadata styling, state treatments, and content rhythm
 - [ ] Revisit the core component language itself, including card shapes, control chrome, panel nesting, chip usage, and grouping patterns, so the UI does not rely on the current repeated rounded-pill treatment
+- [ ] Reduce border radius, outline weight, and container nesting across the shell so cards and controls feel more grounded and less inflated
+- [ ] Explore section-based content grouping and mixed card/list compositions so dashboard pages feel curated and editorial rather than like a uniform grid of oversized widgets
 - [ ] Restyle form controls, selects, buttons, toggles, and status pills to feel more macOS-native while preserving the existing preference and dashboard actions
 - [ ] Rework typography scale and copy presentation so titles, labels, helper text, and widget details feel closer to a polished productivity app than a futuristic ops console
 - [ ] Polish the notification center with better hierarchy, spacing, and read/unread treatment so it matches the refined shell instead of reading like an overlay from a different theme
@@ -130,13 +135,15 @@ This file should be updated after implementation work so completed items, remain
 - This phase is intentionally a visual refinement pass, not a feature expansion phase; it should improve the perceived quality of the existing shell before provider integrations and richer widgets arrive.
 - The current implementation already has a strong shell foundation, but it leans more toward glossy futuristic dashboard styling than the cleaner desktop-productivity blend described in the specification.
 - The target outcome is a dark-mode-first UI that combines macOS-inspired materials, spacing, and controls with Notion-like typography, calm hierarchy, and editorial restraint.
+- The provided reference sharpens that target: dense left navigation, matte dark surfaces, restrained accent use, lower-contrast chrome, and content sections that feel curated rather than heavily framed.
 - A live Playwright review of `/overview` was completed after the initial browser-session issue was cleared, and it confirmed that the current shell already has the right high-level information architecture but needs calmer visual treatment.
 - Specific UI issues observed in the live shell include colors that skew too pale and silvery, oversized corner radii, heavy frosted gradients, too many pill-shaped containers in the header, weak differentiation between primary and secondary controls, and widget cards that feel tall and sparse instead of compact and editorial.
 - The current theme system also applies a noticeable blue cast across large parts of the interface, which makes both modes feel less neutral and less premium than intended; Phase 1.5 should treat palette design as a first-class redesign task rather than a small token tweak.
-- The sidebar layout is structurally good, but its current presentation reads more like a concept dashboard than a native desktop source list; Phase 1.5 should make the active item, icon treatment, spacing, and account panel feel more grounded and utilitarian.
+- The sidebar layout is structurally good, but its current presentation reads more like a concept dashboard than a native desktop source list; Phase 1.5 should make the active item, icon treatment, spacing, and account panel feel more grounded, denser, and more utility-driven.
 - The header control cluster currently competes with the page title for attention; the refinement pass should reduce visual noise, improve grouping, and make settings feel like lightweight toolbar controls rather than feature cards.
 - The visual refresh should prioritize dark graphite and ink surfaces with restrained cool accents, avoiding bright white panels, milky overlays, or neon color pops unless they serve a state or action cue.
 - This phase should not assume the existing component forms are correct; if cards, chips, select wrappers, or grouped controls need different shapes or hierarchy to achieve the target look, the redesign should update those patterns instead of only recoloring them.
+- The redesign should favor flatter cards, tighter list rows, subtle separators, and more content-first composition, using stronger hierarchy and spacing instead of relying on large glass panels and repeated bordered capsules.
 
 ## Phase 2: Integration Framework and Read-Only Data
 

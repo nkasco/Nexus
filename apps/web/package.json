@@ -3,7 +3,7 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "dev": "next dev --port ${WEB_PORT:-3000}",
+    "dev": "node ./scripts/dev-server.mjs",
     "build": "next build",
     "start": "next start --port ${WEB_PORT:-3000}",
     "lint": "eslint .",
