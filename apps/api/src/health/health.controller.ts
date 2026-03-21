@@ -4,10 +4,12 @@ import { HealthService } from './health.service';
 
 @Controller('health')
 export class HealthController {
-  constructor(private readonly healthService: HealthService) {}
+  constructor(private readonly healthService: HealthService) {
+    this.getHealth = this.getHealth.bind(this);
+  }
 
   @Get()
-  getHealth(): HealthResponse {
+  getHealth(): Promise<HealthResponse> {
     return this.healthService.getStatus();
   }
 }

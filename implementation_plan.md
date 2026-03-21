@@ -49,22 +49,40 @@ This file should be updated after implementation work so completed items, remain
 
 ### Deliverables
 
-- [ ] Implement macOS-inspired design tokens, theme system, and layout primitives
-- [ ] Build the app shell with collapsible left sidebar and top bar
-- [ ] Add routes for Overview, Home Lab, Media, DevOps, Metrics, and Alerts
-- [ ] Implement JWT-backed authentication flow for the single-admin user
-- [ ] Add settings persistence for theme and basic UI preferences
-- [ ] Create widget container components with loading, empty, and error states
-- [ ] Add a dashboard configuration model for saving widget layouts
-- [ ] Implement WebSocket infrastructure for real-time updates
-- [ ] Build a notification center UI surface
-- [ ] Create a backend health endpoint and frontend connectivity status indicator
+- [x] Implement macOS-inspired design tokens, theme system, and layout primitives
+- [x] Build the app shell with collapsible left sidebar and top bar
+- [x] Add routes for Overview, Home Lab, Media, DevOps, Metrics, and Alerts
+- [x] Implement JWT-backed authentication flow for the single-admin user
+- [x] Add settings persistence for theme and basic UI preferences
+- [x] Create widget container components with loading, empty, and error states
+- [x] Add a dashboard configuration model for saving widget layouts
+- [x] Implement WebSocket infrastructure for real-time updates
+- [x] Build a notification center UI surface
+- [x] Create a backend health endpoint and frontend connectivity status indicator
 
 ### Exit Criteria
 
-- [ ] User can log in and access a functional dashboard shell
-- [ ] Real-time events can be delivered from backend to frontend
-- [ ] Dashboard routes and layout state persist correctly
+- [x] User can log in and access a functional dashboard shell
+- [x] Real-time events can be delivered from backend to frontend
+- [x] Dashboard routes and layout state persist correctly
+
+### Phase 1 Notes
+
+- Phase 1 now includes a route-aware authenticated dashboard shell across `/overview`, `/home-lab`, `/media`, `/devops`, `/metrics`, and `/alerts`, with a collapsible sidebar, top bar controls, and a notification center surface.
+- The root workspace now exposes a consolidated `npm run dev` command that starts both the API and web development servers together for local operator workflows.
+- The API development workflow now runs through compiled watch output instead of `tsx watch`, which avoids the controller-context runtime failures seen in local Nest requests.
+- Repository agent instructions now explicitly direct future work to use Playwright MCP for browser validation and Context7 MCP for documentation lookup when those tools fit the task.
+- A single-admin JWT login flow was added to the API using `ADMIN_USERNAME`, `ADMIN_PASSWORD`, `ADMIN_DISPLAY_NAME`, `JWT_SECRET`, and `SESSION_TTL_MINUTES`, and the frontend persists the authenticated session locally.
+- UI preferences are stored through Prisma-backed `UserSetting` records, while per-dashboard layout presets are stored in the existing `Dashboard` model and can be changed from the shell.
+- A raw WebSocket transport is attached at `/ws`, broadcasts connection and heartbeat events, and emits notification, settings, and dashboard-update events for the frontend connectivity indicator and notification center.
+- Shared contracts were expanded for auth, settings, dashboards, notifications, realtime events, and enriched health status payloads to keep the frontend and backend aligned.
+- The API runtime now auto-loads a repository-root `.env` file so Prisma and auth configuration work with the normal workspace dev commands.
+- Controller handlers are explicitly bound so the watch/dev runtime serves health and platform routes reliably during local development.
+- The API dev and start scripts now target the actual compiled entrypoint under `dist/apps/api/src/main.js`, aligning local development with the emitted TypeScript build layout.
+- Prisma now bootstraps the local SQLite tables needed for Phase 1 on startup, so a fresh development database can serve login, settings, and dashboard requests without a separate manual migration step.
+- The `/auth/session` endpoint now resolves its payload directly from the bearer token via `AuthService`, avoiding request-state collisions and returning stable JSON during frontend bootstrap.
+- Unit tests now cover the new auth, settings, dashboard, notification, and health backend services as well as the key frontend shell, login, and widget components.
+- Follow-up work introduced by this phase includes optional cookie-based auth hardening, conflict handling for simultaneous layout edits across multiple clients, and end-to-end login/dashboard smoke coverage.
 
 ## Phase 2: Integration Framework and Read-Only Data
 
@@ -251,7 +269,7 @@ This file should be updated after implementation work so completed items, remain
 - [ ] Unit tests for provider adapters, metric normalization, alert rules, and action guards
 - [ ] Integration tests for backend modules and persistence flows
 - [ ] API tests for read endpoints, action endpoints, and auth flows
-- [ ] Frontend component tests for widgets, layout state, and interaction patterns
+- [x] Frontend component tests for widgets, layout state, and interaction patterns
 - [ ] End-to-end smoke tests for login, dashboard load, and core workflows
 
 ### Manual Validation

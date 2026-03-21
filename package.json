@@ -11,6 +11,7 @@
     "npm": ">=11.0.0"
   },
   "scripts": {
+    "dev": "concurrently -k -n API,WEB -c blue,magenta \"npm run dev:api\" \"npm run dev:web\"",
     "dev:web": "npm run dev --workspace @nexus/web",
     "dev:api": "npm run dev --workspace @nexus/api",
     "build": "npm run build --workspace @nexus/web && npm run build --workspace @nexus/api",
@@ -21,6 +22,7 @@
     "format:write": "prettier --write ."
   },
   "devDependencies": {
+    "concurrently": "^9.2.1",
     "prettier": "^3.5.3",
     "typescript": "^5.8.2"
   }
