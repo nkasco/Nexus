@@ -469,3 +469,7 @@ This file should be updated after implementation work so completed items, remain
 - [ ] Complete Phase 5 before relying on Nexus for operational alerting
 - [ ] Complete Phase 6 before positioning Nexus as a true control plane
 - [ ] Use Phase 8 to harden the platform before expanding beyond single-admin private use
+
+## Planning Notes
+
+- A dedicated visual overhaul planning artifact now lives in `visual_overhaul_plan.md` and tracks the Notion-first shell redesign, density reset, widget/form restyling, and Playwright validation work for the next major UI pass.
