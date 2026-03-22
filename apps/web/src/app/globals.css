@@ -27,9 +27,9 @@
   --success-strong: #82a88e;
   --warning-strong: #bc9664;
   --danger-strong: #bf8080;
-  --shadow-soft: 0 16px 40px rgba(0, 0, 0, 0.2);
-  --shadow-panel: 0 10px 28px rgba(0, 0, 0, 0.18);
-  --shadow-lift: 0 6px 18px rgba(0, 0, 0, 0.14);
+  --shadow-soft: 0 12px 30px rgba(0, 0, 0, 0.16);
+  --shadow-panel: 0 8px 22px rgba(0, 0, 0, 0.14);
+  --shadow-lift: 0 4px 12px rgba(0, 0, 0, 0.12);
 }
 
 html[data-theme='light'] {
@@ -57,9 +57,9 @@ html[data-theme='light'] {
   --success-strong: #567b61;
   --warning-strong: #9a6c39;
   --danger-strong: #ac6161;
-  --shadow-soft: 0 14px 34px rgba(96, 78, 56, 0.1);
-  --shadow-panel: 0 8px 22px rgba(96, 78, 56, 0.08);
-  --shadow-lift: 0 4px 14px rgba(96, 78, 56, 0.07);
+  --shadow-soft: 0 12px 28px rgba(96, 78, 56, 0.08);
+  --shadow-panel: 0 6px 18px rgba(96, 78, 56, 0.07);
+  --shadow-lift: 0 3px 10px rgba(96, 78, 56, 0.06);
 }
 
 html[data-accent='aurora'] {
@@ -209,16 +209,16 @@ a:focus-visible {
 @layer components {
   .surface-panel {
     @apply border;
-    border-radius: 16px;
+    border-radius: 14px;
     background: var(--shell-surface);
     border-color: var(--border-soft);
     box-shadow: var(--shadow-panel);
-    backdrop-filter: blur(8px);
+    backdrop-filter: blur(6px);
   }
 
   .surface-card {
     @apply border;
-    border-radius: 14px;
+    border-radius: 12px;
     background: var(--panel-strong);
     border-color: var(--border-soft);
     box-shadow: var(--shadow-lift);
@@ -284,16 +284,16 @@ a:focus-visible {
   }
 
   .hero-stat {
-    @apply border px-3.5 py-3 text-left;
-    border-radius: 12px;
+    @apply border px-3 py-2.5 text-left;
+    border-radius: 10px;
     background: var(--panel-subtle);
     border-color: var(--border-soft);
   }
 
   .toolbar-control,
   .toolbar-button {
-    @apply flex min-h-[44px] min-w-[132px] flex-col justify-between border px-3 py-2.5 text-left text-xs transition duration-150;
-    border-radius: 12px;
+    @apply flex min-h-[40px] min-w-[120px] flex-col justify-between border px-2.5 py-2 text-left text-[11px] transition duration-150;
+    border-radius: 10px;
     background: var(--panel-subtle);
     border-color: var(--border-soft);
   }
@@ -305,12 +305,12 @@ a:focus-visible {
   }
 
   .toolbar-select {
-    @apply mt-1.5 w-full appearance-none bg-transparent pr-5 text-sm font-medium;
+    @apply mt-1 w-full appearance-none bg-transparent pr-5 text-[13px] font-medium;
     color: var(--text-main);
   }
 
   .status-badge {
-    @apply inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-[9px] font-medium uppercase tracking-[0.16em];
+    @apply inline-flex items-center gap-1.5 rounded-[999px] px-2 py-0.5 text-[9px] font-medium uppercase tracking-[0.14em];
     background: color-mix(in srgb, var(--panel-muted) 92%, transparent);
     border: 1px solid var(--border-soft);
     color: var(--text-subtle);
@@ -323,8 +323,8 @@ a:focus-visible {
   }
 
   .shell-input {
-    @apply w-full border px-3 py-2.5 text-sm transition duration-150;
-    border-radius: 10px;
+    @apply w-full border px-3 py-2 text-sm transition duration-150;
+    border-radius: 9px;
     background: var(--panel-subtle);
     border-color: var(--border-soft);
     color: var(--text-main);
@@ -336,8 +336,8 @@ a:focus-visible {
   }
 
   .widget-action-button {
-    @apply inline-flex h-9 items-center justify-center border px-3 text-[11px] font-medium uppercase tracking-[0.1em] transition duration-150;
-    border-radius: 10px;
+    @apply inline-flex h-8 items-center justify-center border px-2.5 text-[10px] font-medium uppercase tracking-[0.08em] transition duration-150;
+    border-radius: 9px;
     background: var(--panel-subtle);
     border-color: var(--border-soft);
     color: var(--text-subtle);
@@ -357,8 +357,8 @@ a:focus-visible {
   }
 
   .widget-config-panel {
-    @apply absolute right-0 z-10 mt-2 w-[240px] border p-3;
-    border-radius: 12px;
+    @apply absolute right-0 z-10 mt-2 w-[228px] border p-2.5;
+    border-radius: 10px;
     background: var(--panel-raised);
     border-color: var(--border-soft);
     box-shadow: var(--shadow-panel);
@@ -366,8 +366,8 @@ a:focus-visible {
   }
 
   .widget-config-option {
-    @apply w-full border px-3 py-2.5 text-left transition duration-150;
-    border-radius: 10px;
+    @apply w-full border px-2.5 py-2 text-left transition duration-150;
+    border-radius: 9px;
     background: var(--panel-subtle);
     border-color: var(--border-soft);
   }
@@ -398,21 +398,19 @@ a:focus-visible {
   }
 
   .workspace-hero {
-    background:
-      linear-gradient(180deg, rgba(255, 255, 255, 0.018), rgba(255, 255, 255, 0)),
-      var(--panel-strong);
+    background: var(--panel-strong);
   }
 
   .workspace-tile {
-    @apply border px-3.5 py-3;
-    border-radius: 12px;
+    @apply border px-3 py-2.5;
+    border-radius: 10px;
     background: var(--panel-subtle);
     border-color: var(--border-soft);
   }
 
   .hero-stat {
-    @apply border px-3.5 py-3;
-    border-radius: 12px;
+    @apply border px-3 py-2.5;
+    border-radius: 10px;
     background: var(--panel-subtle);
     border-color: var(--border-soft);
   }
@@ -422,16 +420,16 @@ a:focus-visible {
   }
 
   .widget-stat-block {
-    @apply border px-3.5 py-3;
-    border-radius: 12px;
+    @apply border px-3 py-2.5;
+    border-radius: 10px;
     background: var(--panel-subtle);
     border-color: var(--border-soft);
   }
 
   .widget-list-row {
-    @apply border px-3.5 py-2.5;
-    border-radius: 10px;
-    background: color-mix(in srgb, var(--panel-subtle) 92%, transparent);
+    @apply border px-3 py-2;
+    border-radius: 9px;
+    background: color-mix(in srgb, var(--panel-subtle) 88%, transparent);
     border-color: var(--border-soft);
   }
 

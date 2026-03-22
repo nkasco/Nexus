@@ -176,22 +176,25 @@ The current shell is coherent, but the live audit showed an oversized presentati
 
 ### Deliverables
 
-- [ ] Rebuild widget framing around tighter headers, smaller actions, cleaner metadata, and lower chrome
-- [ ] Reduce internal widget padding and compress stat blocks, lists, badges, and snapshot footers
-- [ ] Introduce section and list compositions where they scan better than uniform cards
-- [ ] Restyle inputs, selects, toggles, and save actions to feel lighter and more document-tool-like
-- [ ] Rework settings into denser grouped sections so long forms feel more manageable and less inflated
-- [ ] Keep status semantics clear without relying on loud fills or pill-heavy UI
+- [x] Rebuild widget framing around tighter headers, smaller actions, cleaner metadata, and lower chrome
+- [x] Reduce internal widget padding and compress stat blocks, lists, badges, and snapshot footers
+- [x] Introduce section and list compositions where they scan better than uniform cards
+- [x] Restyle inputs, selects, toggles, and save actions to feel lighter and more document-tool-like
+- [x] Rework settings into denser grouped sections so long forms feel more manageable and less inflated
+- [x] Keep status semantics clear without relying on loud fills or pill-heavy UI
 
 ### Exit Criteria
 
-- [ ] Dashboard routes feel information-dense but still readable
-- [ ] Settings becomes easier to scan and faster to use without changing its functional coverage
+- [x] Dashboard routes feel information-dense but still readable
+- [x] Settings becomes easier to scan and faster to use without changing its functional coverage
 
 ### Phase 3 Notes
 
-- The settings workspace currently demonstrates the same inflation problem as the dashboards: large wrappers, large spacing, and repeated stacked panels before core controls.
-- The overhaul should preserve the existing settings coverage and widget behaviors; this phase is visual and structural, not a product-scope change.
+- Phase 3 landed primarily in `apps/web/src/app/globals.css`, `apps/web/src/components/widget-frame.tsx`, and `apps/web/src/components/settings-workspace.tsx`, where the shared radius, padding, shadow, badge, input, and action-button system was tightened again to move the UI farther away from glossy card chrome and closer to a dense document workspace.
+- Dashboard widgets now use smaller headers, tighter footer treatment, lighter action controls, and explicit `Snapshot` plus `Recent detail` or `Attention queue` sections so stats and operational lists scan like grouped content instead of one repeated card pattern.
+- The settings workspace was recomposed into denser sections with lighter top framing, smaller control cards, tighter field rhythm, and more direct helper copy, while preserving the full Phase 3.5 configuration coverage and save flows.
+- Environment-only credential and notification-secret rows now sit inside quieter grouped blocks, which keeps the security boundary clear without relying on oversized pills or repeated heavy wrappers.
+- Unit tests were updated for the shared widget frame and shell rendering assumptions so the tighter responsive heading and section structure remain covered after the refactor.
 
 ## Phase 4: Validation, Regression Coverage, and Follow-Through
 
@@ -202,38 +205,43 @@ The current shell is coherent, but the live audit showed an oversized presentati
 
 ### Deliverables
 
-- [ ] Add or update unit tests for shell layout states, widget framing, and settings presentation changes
-- [ ] Run `npm run test`, `npm run typecheck`, and `npm run lint`
-- [ ] Use Playwright to review login, overview, media, settings, and a mobile viewport after implementation
-- [ ] Record any remaining polish or follow-up items back into this file
-- [ ] Update `implementation_plan.md` to reflect overhaul progress and any follow-up work introduced by the redesign
+- [x] Add or update unit tests for shell layout states, widget framing, and settings presentation changes
+- [x] Run `npm run test`, `npm run typecheck`, and `npm run lint`
+- [x] Use Playwright to review login, overview, media, settings, and a mobile viewport after implementation
+- [x] Record any remaining polish or follow-up items back into this file
+- [x] Update `implementation_plan.md` to reflect overhaul progress and any follow-up work introduced by the redesign
 
 ### Exit Criteria
 
-- [ ] The revised shell is validated on desktop and mobile with Playwright
-- [ ] Verification commands pass, or any remaining failures are documented explicitly
+- [x] The revised shell is validated on desktop and mobile with Playwright
+- [x] Verification commands pass, or any remaining failures are documented explicitly
 
 ### Phase 4 Notes
 
 - The current live audit surfaced the existing `favicon.ico` 404 in the Next.js dev environment; it is unrelated to the visual overhaul but may continue to appear during browser validation until fixed separately.
+- Phase 4 added another shell regression assertion in `apps/web/src/components/app-shell.test.tsx` so the collapsed-sidebar plus compact-layout state remains covered alongside the earlier widget and settings tests.
+- Final validation passed `npm run test --workspace @nexus/web`, `npm run typecheck --workspace @nexus/web`, `npm run lint --workspace @nexus/web`, and `npm run build --workspace @nexus/web` after the Phase 4 follow-through work. The build still emits the existing Next.js ESLint-plugin warning, but it does not fail.
+- Playwright review against the built API on `4000` and the built web app on `3000` now covers the login route, `/overview`, `/media`, `/settings`, and a `390x844` mobile overview viewport. The sweep also exercised layout preset changes, theme switching, the collapsed sidebar state, and notification-center rendering in the overhauled shell.
+- The mobile overview pass still keeps the first widget inside the opening viewport, with the `Compute Status` heading landing at roughly `698px` from the top of a `390x844` viewport during the final check.
+- One browser-path quirk remains: direct API login from Playwright succeeds, but submitting the visible login form still returns `Invalid credentials` during automation. The login route itself renders correctly, so Phase 4 can close, but dedicated end-to-end coverage should revisit the form-submission path specifically.
 
 ## Cross-Phase Testing Strategy
 
 ### Automated Testing
 
-- [ ] Frontend component tests for shell density states, sidebar behavior, widget framing, and settings presentation
+- [x] Frontend component tests for shell density states, sidebar behavior, widget framing, and settings presentation
 - [ ] State-management tests for theme, density, layout preset, and notification interactions affected by shell changes
 - [ ] End-to-end smoke coverage for login, authenticated restore, and route rendering after the overhaul lands
 
 ### Manual Validation
 
-- [ ] Validate the desktop experience on `/overview`, `/media`, and `/settings`
-- [ ] Validate the mobile experience to ensure shell chrome no longer buries the primary content
-- [ ] Validate theme parity in light and dark modes after the token reset
-- [ ] Validate sidebar collapse, notification drawer, theme switch, and layout preset behavior after the visual refactor
+- [x] Validate the desktop experience on `/overview`, `/media`, and `/settings`
+- [x] Validate the mobile experience to ensure shell chrome no longer buries the primary content
+- [x] Validate theme parity in light and dark modes after the token reset
+- [x] Validate sidebar collapse, notification drawer, theme switch, and layout preset behavior after the visual refactor
 
 ## Recommended Delivery Sequence
 
 - [ ] Complete Phase 0 before implementation work starts so density and style goals are locked
 - [ ] Complete Phases 1 and 2 before broad widget-specific polish
-- [ ] Complete Phase 3 before final regression and Playwright validation in Phase 4
+- [x] Complete Phase 3 before final regression and Playwright validation in Phase 4

@@ -68,12 +68,12 @@ function ToggleField({
   onChange: (checked: boolean) => void;
 }) {
   return (
-    <label className="workspace-tile flex items-start justify-between gap-4 p-4">
+    <label className="workspace-tile flex items-start justify-between gap-3 p-3">
       <span className="min-w-0">
         <span className="block text-sm font-medium text-[color:var(--text-main)]">
           {label}
         </span>
-        <span className="mt-1 block text-sm leading-6 text-[color:var(--text-subtle)]">
+        <span className="mt-1 block text-[13px] leading-5 text-[color:var(--text-subtle)]">
           {description}
         </span>
       </span>
@@ -84,6 +84,30 @@ function ToggleField({
         type="checkbox"
       />
     </label>
+  );
+}
+
+function SectionHeader({
+  eyebrow,
+  title,
+  description,
+}: {
+  eyebrow: string;
+  title: string;
+  description?: string;
+}) {
+  return (
+    <div className="mb-3 border-b border-[color:var(--border-soft)] pb-3">
+      <p className="eyebrow-label">{eyebrow}</p>
+      <h2 className="mt-1.5 text-[1.2rem] font-semibold tracking-[-0.03em] text-[color:var(--text-main)]">
+        {title}
+      </h2>
+      {description ? (
+        <p className="mt-1 text-[13px] leading-5 text-[color:var(--text-subtle)]">
+          {description}
+        </p>
+      ) : null}
+    </div>
   );
 }
 
@@ -241,14 +265,14 @@ function IntegrationSettingsCard({
   }
 
   return (
-    <article className="surface-card flex flex-col gap-4 p-5">
-      <div className="flex items-start justify-between gap-4">
-        <div>
+    <article className="surface-card flex flex-col gap-3 p-4">
+      <div className="flex items-start justify-between gap-3">
+        <div className="min-w-0">
           <p className="eyebrow-label">{detail.integration.provider}</p>
-          <h3 className="mt-2 text-xl font-semibold">
+          <h3 className="mt-1.5 text-[1.15rem] font-semibold tracking-[-0.03em]">
             {detail.integration.displayName}
           </h3>
-          <p className="mt-2 text-sm leading-6 text-[color:var(--text-subtle)]">
+          <p className="mt-1 text-[13px] leading-5 text-[color:var(--text-subtle)]">
             {detail.integration.headline}
           </p>
         </div>
@@ -273,16 +297,16 @@ function IntegrationSettingsCard({
           type="number"
           value={pollingIntervalSeconds}
         />
-        <span className="mt-2 block text-sm text-[color:var(--text-subtle)]">
+        <span className="mt-1.5 block text-[13px] leading-5 text-[color:var(--text-subtle)]">
           Keep collection cadence between 15 and 900 seconds.
         </span>
       </label>
 
       {editableCredentials.length > 0 ? (
-        <div className="space-y-3">
+        <div className="space-y-2.5">
           <div>
             <p className="text-sm font-medium">Editable connection details</p>
-            <p className="mt-1 text-sm text-[color:var(--text-subtle)]">
+            <p className="mt-1 text-[13px] leading-5 text-[color:var(--text-subtle)]">
               Leave a field blank to keep using the environment value instead.
             </p>
           </div>
@@ -303,21 +327,24 @@ function IntegrationSettingsCard({
                 type="text"
                 value={credentialValues[credential.key] ?? ''}
               />
+              <span className="mt-1.5 block text-[13px] leading-5 text-[color:var(--text-subtle)]">
+                {credential.envVar} remains the fallback when this field is blank.
+              </span>
             </label>
           ))}
         </div>
       ) : null}
 
       {environmentCredentials.length > 0 ? (
-        <div className="space-y-3">
+        <div className="space-y-2.5">
           <div>
             <p className="text-sm font-medium">Environment-only secrets</p>
-            <p className="mt-1 text-sm text-[color:var(--text-subtle)]">
+            <p className="mt-1 text-[13px] leading-5 text-[color:var(--text-subtle)]">
               Sensitive values stay deployment-managed until encrypted secret storage is added.
             </p>
           </div>
           {environmentCredentials.map((credential) => (
-            <div className="workspace-tile p-4" key={credential.key}>
+            <div className="workspace-tile p-3" key={credential.key}>
               <div className="flex flex-wrap items-center gap-2">
                 <span className="text-sm font-medium">{credential.label}</span>
                 <SectionBadge
@@ -325,7 +352,7 @@ function IntegrationSettingsCard({
                   tone={credential.configured ? 'success' : 'warning'}
                 />
               </div>
-              <p className="mt-2 text-sm text-[color:var(--text-subtle)]">
+              <p className="mt-1.5 text-[13px] leading-5 text-[color:var(--text-subtle)]">
                 Managed through <code>{credential.envVar}</code>.
               </p>
             </div>
@@ -337,7 +364,7 @@ function IntegrationSettingsCard({
       <MessageBanner message={message} />
 
       <button
-        className="widget-action-button h-11 justify-center text-sm"
+        className="widget-action-button h-9 justify-center text-sm"
         disabled={isSaving}
         onClick={() => {
           void handleSave();
@@ -484,80 +511,70 @@ export function SettingsWorkspace({
   }
 
   return (
-    <main className="relative min-h-screen overflow-hidden px-3 py-3 text-[color:var(--text-main)] sm:px-4 sm:py-4">
-      <div
-        aria-hidden="true"
-        className="ambient-orb pointer-events-none absolute left-[-10rem] top-[-8rem] h-[20rem] w-[20rem] rounded-full bg-[radial-gradient(circle,var(--accent-soft)_0%,transparent_70%)] opacity-48"
-      />
-      <div
-        aria-hidden="true"
-        className="ambient-orb pointer-events-none absolute bottom-[-10rem] right-[-9rem] h-[20rem] w-[20rem] rounded-full bg-[radial-gradient(circle,rgba(255,255,255,0.05)_0%,transparent_72%)] opacity-24"
-      />
-
-      <div className="relative mx-auto flex max-w-[1440px] flex-col gap-4">
-        <section className="surface-panel relative overflow-hidden px-4 py-4 sm:px-5 sm:py-5">
-          <div className="pointer-events-none absolute inset-x-0 top-0 h-28 bg-[linear-gradient(180deg,color-mix(in_srgb,var(--accent-soft)_58%,transparent),transparent_80%)] opacity-70" />
-          <div className="relative flex flex-col gap-5 lg:flex-row lg:items-start lg:justify-between">
+    <main className="min-h-screen px-2.5 py-2.5 text-[color:var(--text-main)] sm:px-3 sm:py-3">
+      <div className="mx-auto flex max-w-[1380px] flex-col gap-3">
+        <section className="surface-panel px-3.5 py-3.5 sm:px-4 sm:py-4">
+          <div className="flex flex-col gap-3 lg:flex-row lg:items-start lg:justify-between">
             <div className="max-w-3xl">
-              <div className="flex flex-wrap items-center gap-2">
-                <SectionBadge label="Phase 3.6" tone="success" />
-                <SectionBadge label="Phase 3.6 shell refresh" />
-                <SectionBadge label="Configuration ownership mapped" />
+              <div className="flex flex-wrap items-center gap-1.5">
+                <SectionBadge label="Visual overhaul phase 3" tone="success" />
+                <SectionBadge label="Settings coverage live" />
+                <SectionBadge label="Ownership mapped" />
               </div>
-              <h1 className="mt-4 text-[2.35rem] font-semibold tracking-[-0.06em] sm:text-[2.9rem]">
+              <h1 className="mt-3 text-[2rem] font-semibold tracking-[-0.05em] sm:text-[2.35rem]">
                 Settings
               </h1>
-              <p className="mt-3 max-w-3xl text-sm leading-6 text-[color:var(--text-subtle)]">
+              <p className="mt-2 max-w-3xl text-[13px] leading-5 text-[color:var(--text-subtle)]">
                 One operational surface for what Nexus owns in-app, what still belongs to the deployment environment, and what remains intentionally deferred.
               </p>
 
-              <div className="mt-5 grid gap-2.5 md:grid-cols-3">
+              <div className="mt-3 grid gap-2 md:grid-cols-3">
                 <div className="hero-stat">
                   <p className="eyebrow-label">In-app</p>
-                  <p className="mt-2.5 text-[1.1rem] font-semibold tracking-[-0.04em]">
+                  <p className="mt-1.5 text-[1rem] font-semibold tracking-[-0.03em]">
                     {ownership.inApp}
                   </p>
-                  <p className="mt-2 text-sm leading-6 text-[color:var(--text-subtle)]">
+                  <p className="mt-1 text-[13px] leading-5 text-[color:var(--text-subtle)]">
                     Managed directly through Nexus.
                   </p>
                 </div>
                 <div className="hero-stat">
                   <p className="eyebrow-label">Environment</p>
-                  <p className="mt-2.5 text-[1.1rem] font-semibold tracking-[-0.04em]">
+                  <p className="mt-1.5 text-[1rem] font-semibold tracking-[-0.03em]">
                     {ownership.environment}
                   </p>
-                  <p className="mt-2 text-sm leading-6 text-[color:var(--text-subtle)]">
+                  <p className="mt-1 text-[13px] leading-5 text-[color:var(--text-subtle)]">
                     Still deployment-managed for safety or secret handling.
                   </p>
                 </div>
                 <div className="hero-stat">
                   <p className="eyebrow-label">Deferred</p>
-                  <p className="mt-2.5 text-[1.1rem] font-semibold tracking-[-0.04em]">
+                  <p className="mt-1.5 text-[1rem] font-semibold tracking-[-0.03em]">
                     {ownership.deferred}
                   </p>
-                  <p className="mt-2 text-sm leading-6 text-[color:var(--text-subtle)]">
+                  <p className="mt-1 text-[13px] leading-5 text-[color:var(--text-subtle)]">
                     Explicitly held for a later product phase.
                   </p>
                 </div>
               </div>
             </div>
 
-            <div className="surface-card grid gap-2 p-3.5 sm:grid-cols-2 lg:w-[392px]">
+            <div className="surface-card grid gap-2 p-3 sm:grid-cols-2 lg:w-[372px]">
               <div className="toolbar-control">
                 <span className="eyebrow-label">Signed in as</span>
-                <span className="mt-2 block text-sm font-medium text-[color:var(--text-main)]">
+                <span className="mt-1.5 block text-sm font-medium text-[color:var(--text-main)]">
                   {userName}
                 </span>
               </div>
               <div className="toolbar-control">
                 <span className="eyebrow-label">Ownership</span>
-                <span className="mt-2 block text-sm font-medium text-[color:var(--text-main)]">
+                <span className="mt-1.5 block text-sm font-medium text-[color:var(--text-main)]">
                   {ownership.inApp} in-app / {ownership.environment} env / {ownership.deferred} deferred
                 </span>
               </div>
               <Link className="toolbar-button" href={`/${operatorDraft.defaultLandingSection}`}>
                 <span className="eyebrow-label">Default landing</span>
-                <span className="mt-2 block text-sm font-medium text-[color:var(--text-main)]">
+                <span className="mt-1.5 block text-sm font-medium text-[color:var(--text-main)]">
                   Open {operatorDraft.defaultLandingSection}
                 </span>
               </Link>
@@ -567,7 +584,7 @@ export function SettingsWorkspace({
                 type="button"
               >
                 <span className="eyebrow-label">Session</span>
-                <span className="mt-2 block text-sm font-medium text-[color:var(--text-main)]">
+                <span className="mt-1.5 block text-sm font-medium text-[color:var(--text-main)]">
                   Sign out
                 </span>
               </button>
@@ -575,19 +592,17 @@ export function SettingsWorkspace({
           </div>
         </section>
 
-        <section className="grid gap-4 xl:grid-cols-[1.15fr,0.85fr]">
-          <article className="surface-card p-4 sm:p-5">
-            <p className="eyebrow-label">Configuration Audit</p>
-            <h2 className="mt-2 text-2xl font-semibold tracking-[-0.04em]">
-              Ownership map
-            </h2>
-            <p className="mt-2 text-sm leading-6 text-[color:var(--text-subtle)]">
-              Every required configuration path now has a named home: in-app, environment-driven, or intentionally deferred.
-            </p>
+        <section className="grid gap-3 xl:grid-cols-[1.15fr,0.85fr]">
+          <article className="surface-card p-3.5 sm:p-4">
+            <SectionHeader
+              description="Every required configuration path now has a named home: in-app, environment-driven, or intentionally deferred."
+              eyebrow="Configuration Audit"
+              title="Ownership map"
+            />
 
-            <div className="mt-4 grid gap-2.5 md:grid-cols-2">
+            <div className="grid gap-2 md:grid-cols-2">
               {configurationAudit.map((item) => (
-                <div className="workspace-tile p-4" key={item.id}>
+                <div className="workspace-tile p-3" key={item.id}>
                   <div className="flex flex-wrap items-center gap-2">
                     <p className="text-sm font-medium">{item.label}</p>
                     <SectionBadge
@@ -601,10 +616,10 @@ export function SettingsWorkspace({
                       }
                     />
                   </div>
-                  <p className="mt-2 text-sm leading-6 text-[color:var(--text-subtle)]">
+                  <p className="mt-1.5 text-[13px] leading-5 text-[color:var(--text-subtle)]">
                     {item.summary}
                   </p>
-                  <p className="mt-3 text-sm leading-6 text-[color:var(--text-muted)]">
+                  <p className="mt-2 text-[12px] leading-5 text-[color:var(--text-muted)]">
                     {item.phaseCoverage}
                   </p>
                 </div>
@@ -612,13 +627,10 @@ export function SettingsWorkspace({
             </div>
           </article>
 
-          <div className="grid gap-4">
-            <article className="surface-card p-4 sm:p-5">
-              <p className="eyebrow-label">Appearance</p>
-              <h2 className="mt-2 text-2xl font-semibold tracking-[-0.04em]">
-                Shell preferences
-              </h2>
-              <div className="mt-4 grid gap-2.5">
+          <div className="grid gap-3">
+            <article className="surface-card p-3.5 sm:p-4">
+              <SectionHeader eyebrow="Appearance" title="Shell preferences" />
+              <div className="grid gap-2">
                 <label className="block">
                   <span className="mb-2 block text-sm font-medium">Theme</span>
                   <select
@@ -675,12 +687,12 @@ export function SettingsWorkspace({
                   }
                 />
               </div>
-              <div className="mt-4 space-y-3">
+              <div className="mt-3 space-y-2">
                 <MessageBanner error message={appearanceError} />
                 <MessageBanner message={appearanceMessage} />
               </div>
               <button
-                className="widget-action-button mt-4 h-10 justify-center text-sm"
+                className="widget-action-button mt-3 h-9 justify-center text-sm"
                 disabled={isSavingAppearance}
                 onClick={() => {
                   void handleAppearanceSave();
@@ -691,12 +703,9 @@ export function SettingsWorkspace({
               </button>
             </article>
 
-            <article className="surface-card p-4 sm:p-5">
-              <p className="eyebrow-label">Operator Defaults</p>
-              <h2 className="mt-2 text-2xl font-semibold tracking-[-0.04em]">
-                Behavior
-              </h2>
-              <div className="mt-4 grid gap-2.5">
+            <article className="surface-card p-3.5 sm:p-4">
+              <SectionHeader eyebrow="Operator Defaults" title="Behavior" />
+              <div className="grid gap-2">
                 <label className="block">
                   <span className="mb-2 block text-sm font-medium">
                     Default landing page
@@ -743,12 +752,12 @@ export function SettingsWorkspace({
                   }
                 />
               </div>
-              <div className="mt-4 space-y-3">
+              <div className="mt-3 space-y-2">
                 <MessageBanner error message={operatorError} />
                 <MessageBanner message={operatorMessage} />
               </div>
               <button
-                className="widget-action-button mt-4 h-10 justify-center text-sm"
+                className="widget-action-button mt-3 h-9 justify-center text-sm"
                 disabled={isSavingOperator}
                 onClick={() => {
                   void handleOperatorSave();
@@ -761,17 +770,15 @@ export function SettingsWorkspace({
           </div>
         </section>
 
-        <section className="surface-card p-4 sm:p-5">
-          <p className="eyebrow-label">Notifications</p>
-          <h2 className="mt-2 text-2xl font-semibold tracking-[-0.04em]">
-            Channel readiness
-          </h2>
-          <p className="mt-2 text-sm leading-6 text-[color:var(--text-subtle)]">
-            Configure the non-secret delivery metadata now so Phase 5 alert fanout has a clean path to finish.
-          </p>
+        <section className="surface-card p-3.5 sm:p-4">
+          <SectionHeader
+            description="Configure the non-secret delivery metadata now so Phase 5 alert fanout has a clean path to finish."
+            eyebrow="Notifications"
+            title="Channel readiness"
+          />
 
-          <div className="mt-4 grid gap-3.5 xl:grid-cols-[0.9fr,1.1fr]">
-            <div className="grid gap-2.5">
+          <div className="grid gap-3 xl:grid-cols-[0.9fr,1.1fr]">
+            <div className="grid gap-2">
               <ToggleField
                 checked={notificationDraft.notificationsEnabled}
                 description="Master switch for future alert delivery once the Phase 5 engine is active."
@@ -823,12 +830,12 @@ export function SettingsWorkspace({
                   <option value="email">Email</option>
                 </select>
               </label>
-              <div className="space-y-3">
+              <div className="space-y-2">
                 <MessageBanner error message={notificationError} />
                 <MessageBanner message={notificationMessage} />
               </div>
               <button
-                className="widget-action-button h-10 justify-center text-sm"
+                className="widget-action-button h-9 justify-center text-sm"
                 disabled={isSavingNotifications}
                 onClick={() => {
                   void handleNotificationSave();
@@ -839,9 +846,9 @@ export function SettingsWorkspace({
               </button>
             </div>
 
-            <div className="grid gap-2.5 md:grid-cols-2">
+            <div className="grid gap-2 md:grid-cols-2">
               {notificationDraft.channels.map((channel) => (
-                <article className="workspace-tile p-4" key={channel.channel}>
+                <article className="workspace-tile p-3" key={channel.channel}>
                   <div className="flex flex-wrap items-center gap-2">
                     <p className="text-sm font-medium">{channel.label}</p>
                     <SectionBadge
@@ -849,11 +856,11 @@ export function SettingsWorkspace({
                       tone={channel.configured ? 'success' : 'warning'}
                     />
                   </div>
-                  <p className="mt-2 text-sm leading-6 text-[color:var(--text-subtle)]">
+                  <p className="mt-1.5 text-[13px] leading-5 text-[color:var(--text-subtle)]">
                     {channel.description}
                   </p>
 
-                  <div className="mt-4">
+                  <div className="mt-3">
                     <ToggleField
                       checked={channel.enabled}
                       description="Enable this route for future alert delivery."
@@ -874,7 +881,7 @@ export function SettingsWorkspace({
                     />
                   </div>
 
-                  <div className="mt-4 space-y-3">
+                  <div className="mt-3 space-y-2.5">
                     {channel.fields.map((field) =>
                       field.editable ? (
                         <label className="block" key={field.key}>
@@ -911,12 +918,12 @@ export function SettingsWorkspace({
                             type="text"
                             value={field.value}
                           />
-                          <span className="mt-2 block text-sm leading-6 text-[color:var(--text-subtle)]">
+                          <span className="mt-1.5 block text-[13px] leading-5 text-[color:var(--text-subtle)]">
                             {field.description}
                           </span>
                         </label>
                       ) : (
-                        <div className="surface-card p-3" key={field.key}>
+                        <div className="surface-card p-2.5" key={field.key}>
                           <div className="flex flex-wrap items-center gap-2">
                             <span className="text-sm font-medium">{field.label}</span>
                             <SectionBadge
@@ -924,10 +931,10 @@ export function SettingsWorkspace({
                               tone={field.configured ? 'success' : 'warning'}
                             />
                           </div>
-                          <p className="mt-2 text-sm leading-6 text-[color:var(--text-subtle)]">
+                          <p className="mt-1.5 text-[13px] leading-5 text-[color:var(--text-subtle)]">
                             {field.description}
                           </p>
-                          <p className="mt-2 text-sm text-[color:var(--text-muted)]">
+                          <p className="mt-1.5 text-[12px] leading-5 text-[color:var(--text-muted)]">
                             Managed through <code>{field.envVar}</code>.
                           </p>
                         </div>
@@ -941,17 +948,17 @@ export function SettingsWorkspace({
         </section>
 
         <section>
-          <div className="mb-3.5">
+          <div className="mb-3">
             <p className="eyebrow-label">Integrations</p>
-            <h2 className="mt-2 text-2xl font-semibold tracking-[-0.04em]">
+            <h2 className="mt-1.5 text-[1.2rem] font-semibold tracking-[-0.03em]">
               Provider configuration
             </h2>
-            <p className="mt-2 text-sm leading-6 text-[color:var(--text-subtle)]">
+            <p className="mt-1 text-[13px] leading-5 text-[color:var(--text-subtle)]">
               Each adapter now exposes enablement, cadence, and non-secret connection controls in one place.
             </p>
           </div>
 
-          <div className="grid gap-3.5 xl:grid-cols-2">
+          <div className="grid gap-3 xl:grid-cols-2">
             {integrationCards.map((detail) => (
               <IntegrationSettingsCard
                 detail={detail}

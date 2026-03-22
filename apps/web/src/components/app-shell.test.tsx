@@ -115,7 +115,7 @@ describe('AppShell', () => {
     expect(screen.getAllByText('Overview').length).toBeGreaterThan(0);
     expect(screen.getByText(/Workspace controls/i)).toBeInTheDocument();
     expect(screen.getByText('Dashboard field')).toBeInTheDocument();
-    expect(screen.getByText('Attention Summary')).toBeInTheDocument();
+    expect(screen.getAllByText('Attention Summary').length).toBeGreaterThan(0);
     expect(screen.getByText('1 unread item')).toBeInTheDocument();
     expect(screen.getByText('Proxmox sync')).toBeInTheDocument();
     expect(screen.getByText('Refresh')).toBeInTheDocument();
@@ -143,5 +143,78 @@ describe('AppShell', () => {
       'border',
     );
     expect(container.firstChild).toHaveClass('workspace-frame', 'px-2', 'py-2');
+  });
+
+  it('renders collapsed sidebar and compact widget spans', () => {
+    const compactPreferences: UiPreferences = {
+      ...preferences,
+      sidebarCollapsed: true,
+      compactMode: true,
+    };
+
+    const { getByTestId } = render(
+      <AppShell
+        dashboard={dashboard}
+        health={{
+          service: 'nexus-api',
+          status: 'ok',
+          timestamp: '2026-03-21T12:00:00.000Z',
+          uptimeSeconds: 12,
+          components: [],
+        }}
+        isNotificationCenterOpen={false}
+        isSaving={false}
+        lastEventAt="2026-03-21T12:00:00.000Z"
+        notifications={notifications}
+        onWidgetFocusChange={() => {}}
+        onWidgetRefresh={() => {}}
+        onAccentChange={() => {}}
+        onCompactToggle={() => {}}
+        onLayoutPresetChange={() => {}}
+        onMarkAllRead={() => {}}
+        onNotificationToggle={() => {}}
+        onSidebarToggle={() => {}}
+        onSignOut={() => {}}
+        onThemeChange={() => {}}
+        preferences={compactPreferences}
+        refreshingWidgetIds={{}}
+        section="overview"
+        unreadCount={1}
+        userName="Primary Operator"
+        use24HourTime={false}
+        websocketStatus="connected"
+        widgets={[
+          {
+            id: 'overview-health',
+            title: 'Attention Summary',
+            eyebrow: 'Attention',
+            detail: 'Operational signals sourced from the current snapshot.',
+            metric: '1 signal',
+            state: 'ready',
+            focus: 'summary',
+            stats: [
+              {
+                label: 'Healthy',
+                value: '1',
+                detail: 'Providers currently healthy',
+                tone: 'success',
+              },
+            ],
+            tone: 'success',
+            updatedLabel: 'just now',
+            columnSpan: 2,
+            rowSpan: 1,
+          },
+        ]}
+      />,
+    );
+
+    expect(
+      screen.getByRole('button', { name: 'Expand sidebar' }),
+    ).toBeInTheDocument();
+    expect(screen.getAllByText('Compact').length).toBeGreaterThan(0);
+    expect(getByTestId('app-sidebar')).toHaveClass('xl:w-[80px]');
+    expect(getByTestId('nav-link-overview')).toHaveClass('xl:min-w-0');
+    expect(screen.getAllByText('Attention Summary').length).toBeGreaterThan(0);
   });
 });

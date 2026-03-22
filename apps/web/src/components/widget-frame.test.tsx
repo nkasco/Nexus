@@ -25,14 +25,15 @@ describe('WidgetFrame', () => {
       </WidgetFrame>,
     );
 
-    expect(screen.getByText('Signal')).toBeInTheDocument();
+    expect(screen.getAllByText('Signal').length).toBeGreaterThan(0);
     expect(screen.getByText('Ready detail')).toBeInTheDocument();
+    expect(screen.getByText('Snapshot')).toBeInTheDocument();
     expect(screen.getByText(/Updated just now/i)).toBeInTheDocument();
     expect(screen.getByText('Live content')).toBeInTheDocument();
     expect(container.querySelector('article')).toHaveClass(
       'surface-card',
-      'p-4',
-      'min-h-[280px]',
+      'p-3.5',
+      'min-h-[248px]',
     );
   });
 
@@ -97,5 +98,6 @@ describe('WidgetFrame', () => {
     fireEvent.click(screen.getByText('Configure'));
     fireEvent.click(screen.getByText('attention'));
     expect(onFocusChange).toHaveBeenCalledWith('attention');
+    expect(screen.getByText('Recent detail')).toBeInTheDocument();
   });
 });

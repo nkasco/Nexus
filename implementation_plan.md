@@ -344,6 +344,35 @@ This file should be updated after implementation work so completed items, remain
 - `npm run typecheck --workspace @nexus/web`, `npm run lint --workspace @nexus/web`, `npm run test --workspace @nexus/web`, and `npm run build --workspace @nexus/web` all passed after the Phase 2 work. The build still emits the existing Next.js ESLint-plugin warning, but it does not fail the build.
 - The current red item remains local Next.js dev-session stability: the long-lived `localhost:3000` flow is still unreliable, and even the direct dev server on `3200` must be restarted if `next build` and `next dev` touch `.next` at the same time. Follow-up work introduced by this phase includes tightening the remaining mobile route-toolbar height during Phase 3 and resolving the local `.next` artifact contention so browser validation can use a stable default dev path again.
 
+### Phase 3: Widget, Form, and Settings Refactor
+
+#### Deliverables
+
+- [x] Rebuild widget framing around tighter headers, smaller actions, cleaner metadata, and lower chrome
+- [x] Reduce internal widget padding and compress stat blocks, lists, badges, and snapshot footers
+- [x] Introduce section and list compositions where they scan better than uniform cards
+- [x] Restyle inputs, selects, toggles, and save actions to feel lighter and more document-tool-like
+- [x] Rework settings into denser grouped sections so long forms feel more manageable and less inflated
+- [x] Keep status semantics clear without relying on loud fills or pill-heavy UI
+
+#### Exit Criteria
+
+- [x] Dashboard routes feel information-dense but still readable
+- [x] Settings becomes easier to scan and faster to use without changing its functional coverage
+
+#### Notes
+
+- Phase 3 concentrated on the shared visual primitives and the two highest-leverage presentation surfaces: `apps/web/src/app/globals.css`, `apps/web/src/components/widget-frame.tsx`, and `apps/web/src/components/settings-workspace.tsx`.
+- Shared chrome is now quieter and denser across cards, tiles, badges, action buttons, inputs, and config popovers, with smaller radii, lighter shadows, reduced padding, and flatter section backgrounds that better match the Notion-first workspace direction.
+- Widget cards now group content into explicit `Snapshot` and `Recent detail` or `Attention queue` sections, use smaller metrics and footer treatment, and keep refresh or configuration affordances visible without reading like a cluster of mini-cards.
+- The settings route keeps its full Phase 3.5 coverage, but the page hierarchy is now materially tighter: the title block, ownership summary, grouped sections, toggle rows, notification channel forms, and integration cards all consume less space before the operator reaches the core controls.
+- Frontend unit coverage was updated for the revised widget and shell rendering structure, including the responsive widget headings and denser card classes introduced by the refactor.
+- A follow-up regression test now covers the collapsed-sidebar plus compact-layout shell state so the overhaul keeps protection around one of its most layout-sensitive combinations.
+- `npm run test --workspace @nexus/web`, `npm run typecheck --workspace @nexus/web`, `npm run lint --workspace @nexus/web`, and `npm run build --workspace @nexus/web` all passed after the Phase 3 work. The build still emits the existing Next.js ESLint-plugin warning, but it does not fail.
+- Playwright validation against the built API on port `4000` and the built web app on port `3000` now covers the login route, `/overview`, `/media`, and `/settings`, plus a `390x844` mobile overview pass that still keeps the first widget visible in the opening viewport.
+- The same browser sweep exercised light and dark theme rendering, layout preset changes, the collapsed-sidebar state, and notification-center rendering in the overhauled shell.
+- The remaining follow-up from this phase is now narrower: the visible login form still returns `Invalid credentials` during Playwright automation even though direct API login succeeds, the development-time `favicon.ico` 404 is still present, and broader end-to-end coverage is still needed for authenticated restore and route rendering.
+
 ## Phase 3.6: UI Overhaul and Interaction Polish
 
 ### Objectives

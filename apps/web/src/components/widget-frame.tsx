@@ -108,25 +108,44 @@ export function WidgetFrame({
   return (
     <article
       className={clsx(
-        'widget-shell surface-card flex min-h-[280px] flex-col p-4 sm:p-5',
+        'widget-shell surface-card flex min-h-[248px] flex-col p-3.5 sm:p-4',
         className,
       )}
       data-state={state}
     >
-      <div className="flex flex-col gap-4 border-b border-[color:var(--border-soft)] pb-4">
+      <div className="flex flex-col gap-3 border-b border-[color:var(--border-soft)] pb-3">
         <div className="flex flex-col gap-3 xl:flex-row xl:items-start xl:justify-between">
-          <div className="min-w-0">
+          <div className="min-w-0 flex-1">
             <p className="eyebrow-label">{eyebrow}</p>
-            <h3 className="mt-2.5 text-[1.55rem] font-semibold tracking-[-0.05em] text-[color:var(--text-main)]">
+            <div className="mt-2 flex flex-wrap items-start justify-between gap-2 xl:hidden">
+              <h3 className="min-w-0 text-[1.28rem] font-semibold tracking-[-0.04em] text-[color:var(--text-main)]">
+                {title}
+              </h3>
+              {metric ? (
+                <div
+                  className={clsx(
+                    'rounded-[9px] border px-2 py-1 text-[10px] font-medium uppercase tracking-[0.08em]',
+                    toneSurfaceClass(state === 'ready' ? tone : 'default'),
+                    state === 'ready' ? toneClass(tone) : toneClass('default'),
+                  )}
+                >
+                  {metric}
+                </div>
+              ) : null}
+            </div>
+            <h3 className="mt-2 hidden text-[1.28rem] font-semibold tracking-[-0.04em] text-[color:var(--text-main)] xl:block">
               {title}
             </h3>
+            <p className="mt-1.5 max-w-3xl text-[13px] leading-5 text-[color:var(--text-subtle)]">
+              {detail}
+            </p>
           </div>
 
-          <div className="flex flex-col items-start gap-2.5 xl:items-end">
+          <div className="flex flex-col items-start gap-2 xl:items-end">
             {metric ? (
               <div
                 className={clsx(
-                  'rounded-[10px] border px-2.5 py-1 text-[11px] font-medium uppercase tracking-[0.1em]',
+                  'hidden rounded-[9px] border px-2 py-1 text-[10px] font-medium uppercase tracking-[0.08em] xl:inline-flex',
                   toneSurfaceClass(state === 'ready' ? tone : 'default'),
                   state === 'ready' ? toneClass(tone) : toneClass('default'),
                 )}
@@ -135,7 +154,7 @@ export function WidgetFrame({
               </div>
             ) : null}
 
-            <div className="flex flex-wrap gap-2">
+            <div className="flex flex-wrap gap-1.5">
               {onRefresh ? (
                 <button
                   className="widget-action-button"
@@ -161,7 +180,7 @@ export function WidgetFrame({
                   {isConfigOpen ? (
                     <div className="widget-config-panel">
                       <p className="eyebrow-label">Display focus</p>
-                      <div className="mt-3 grid gap-2">
+                      <div className="mt-2.5 grid gap-1.5">
                         {(['summary', 'attention'] as const).map((option) => (
                           <button
                             className={clsx(
@@ -175,10 +194,10 @@ export function WidgetFrame({
                             }}
                             type="button"
                           >
-                            <span className="block text-sm font-medium capitalize text-[color:var(--text-main)]">
+                            <span className="block text-[13px] font-medium capitalize text-[color:var(--text-main)]">
                               {option}
                             </span>
-                            <span className="mt-1 block text-xs leading-5 text-[color:var(--text-subtle)]">
+                            <span className="mt-1 block text-[11px] leading-[1.125rem] text-[color:var(--text-subtle)]">
                               {option === 'summary'
                                 ? 'Balanced snapshot across the current surface.'
                                 : 'Prioritize warnings and degraded items first.'}
@@ -199,52 +218,64 @@ export function WidgetFrame({
             </div>
           </div>
         </div>
-
-        <p className="max-w-3xl text-sm leading-6 text-[color:var(--text-subtle)]">
-          {detail}
-        </p>
       </div>
 
-      <div className="mt-4 flex flex-1 flex-col justify-between">
+      <div className="mt-3 flex flex-1 flex-col justify-between">
         {fallback ? (
           <div className="widget-stat-block">
             <p className={clsx('text-sm font-medium', fallback.toneClass)}>
               {fallback.label}
             </p>
-            <p className="mt-2 text-sm leading-6 text-[color:var(--text-subtle)]">
+            <p className="mt-1.5 text-sm leading-5 text-[color:var(--text-subtle)]">
               {fallback.body}
             </p>
           </div>
         ) : (
-          <div className="space-y-3.5">
+          <div className="space-y-3">
             {stats && stats.length > 0 ? (
-              <div className="grid gap-2.5 lg:grid-cols-3">
-                {stats.map((entry) => (
-                  <div
-                    className={clsx('widget-stat-block', toneSurfaceClass(entry.tone))}
-                    key={`${entry.label}-${entry.value}`}
-                  >
-                    <p className="eyebrow-label">{entry.label}</p>
-                    <p
-                      className={clsx(
-                        'mt-2.5 text-[1.1rem] font-semibold tracking-[-0.04em]',
-                        toneClass(entry.tone),
-                      )}
+              <section className="space-y-2">
+                <div className="flex items-center justify-between gap-2">
+                  <p className="eyebrow-label">Snapshot</p>
+                  <span className="text-[11px] text-[color:var(--text-muted)]">
+                    {stats.length} signal{stats.length === 1 ? '' : 's'}
+                  </span>
+                </div>
+                <div className="grid gap-2 lg:grid-cols-3">
+                  {stats.map((entry) => (
+                    <div
+                      className={clsx('widget-stat-block', toneSurfaceClass(entry.tone))}
+                      key={`${entry.label}-${entry.value}`}
                     >
-                      {entry.value}
-                    </p>
-                    {entry.detail ? (
-                      <p className="mt-2 text-sm leading-6 text-[color:var(--text-subtle)]">
-                        {entry.detail}
+                      <p className="eyebrow-label">{entry.label}</p>
+                      <p
+                        className={clsx(
+                          'mt-1.5 text-[1rem] font-semibold tracking-[-0.03em]',
+                          toneClass(entry.tone),
+                        )}
+                      >
+                        {entry.value}
                       </p>
-                    ) : null}
-                  </div>
-                ))}
-              </div>
+                      {entry.detail ? (
+                        <p className="mt-1.5 text-[13px] leading-5 text-[color:var(--text-subtle)]">
+                          {entry.detail}
+                        </p>
+                      ) : null}
+                    </div>
+                  ))}
+                </div>
+              </section>
             ) : null}
 
             {items && items.length > 0 ? (
-              <div className="space-y-2">
+              <section className="space-y-2">
+                <div className="flex items-center justify-between gap-2">
+                  <p className="eyebrow-label">
+                    {focus === 'attention' ? 'Attention queue' : 'Recent detail'}
+                  </p>
+                  <span className="text-[11px] text-[color:var(--text-muted)]">
+                    {items.length} item{items.length === 1 ? '' : 's'}
+                  </span>
+                </div>
                 {items.map((entry) => (
                   <div
                     className={clsx('widget-list-row', toneSurfaceClass(entry.tone))}
@@ -254,13 +285,13 @@ export function WidgetFrame({
                       <div className="min-w-0 flex-1">
                         <p
                           className={clsx(
-                            'text-sm font-medium leading-6',
+                            'text-sm font-medium leading-5',
                             toneClass(entry.tone),
                           )}
                         >
                           {entry.label}
                         </p>
-                        <p className="mt-1 text-sm leading-6 text-[color:var(--text-subtle)]">
+                        <p className="mt-0.5 text-[13px] leading-5 text-[color:var(--text-subtle)]">
                           {entry.detail}
                         </p>
                       </div>
@@ -270,17 +301,21 @@ export function WidgetFrame({
                     </div>
                   </div>
                 ))}
-              </div>
+              </section>
             ) : null}
 
-            {children ? <div className="space-y-2.5">{children}</div> : null}
+            {children ? (
+              <div className="border-t border-[color:var(--border-soft)] pt-3">
+                <div className="space-y-2.5">{children}</div>
+              </div>
+            ) : null}
           </div>
         )}
 
-        <div className="mt-5 flex flex-col gap-2 border-t border-[color:var(--border-soft)] pt-3 text-sm leading-6 text-[color:var(--text-subtle)] sm:flex-row sm:items-center sm:justify-between sm:gap-4">
+        <div className="mt-4 flex flex-col gap-2 border-t border-[color:var(--border-soft)] pt-2.5 text-sm leading-5 text-[color:var(--text-subtle)] sm:flex-row sm:items-center sm:justify-between sm:gap-4">
           <p className="eyebrow-label">Current snapshot</p>
           {updatedLabel ? (
-            <p className="whitespace-nowrap text-xs uppercase tracking-[0.16em] text-[color:var(--text-muted)]">
+            <p className="whitespace-nowrap text-[11px] uppercase tracking-[0.14em] text-[color:var(--text-muted)]">
               Updated {updatedLabel}
             </p>
           ) : null}
