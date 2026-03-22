@@ -3,7 +3,7 @@ import { WidgetFrame } from './widget-frame';
 
 describe('WidgetFrame', () => {
   it('renders ready content', () => {
-    render(
+    const { container } = render(
       <WidgetFrame
         detail="Ready detail"
         eyebrow="Ready"
@@ -29,6 +29,11 @@ describe('WidgetFrame', () => {
     expect(screen.getByText('Ready detail')).toBeInTheDocument();
     expect(screen.getByText(/Updated just now/i)).toBeInTheDocument();
     expect(screen.getByText('Live content')).toBeInTheDocument();
+    expect(container.querySelector('article')).toHaveClass(
+      'surface-card',
+      'p-4',
+      'min-h-[280px]',
+    );
   });
 
   it('renders fallback copy for loading widgets', () => {

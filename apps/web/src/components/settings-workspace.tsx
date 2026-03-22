@@ -484,37 +484,37 @@ export function SettingsWorkspace({
   }
 
   return (
-    <main className="relative min-h-screen overflow-hidden px-4 py-4 text-[color:var(--text-main)] sm:px-6 sm:py-6">
+    <main className="relative min-h-screen overflow-hidden px-3 py-3 text-[color:var(--text-main)] sm:px-4 sm:py-4">
       <div
         aria-hidden="true"
-        className="ambient-orb pointer-events-none absolute left-[-12rem] top-[-8rem] h-[28rem] w-[28rem] rounded-full bg-[radial-gradient(circle,var(--accent-soft)_0%,transparent_70%)] opacity-80"
+        className="ambient-orb pointer-events-none absolute left-[-10rem] top-[-8rem] h-[20rem] w-[20rem] rounded-full bg-[radial-gradient(circle,var(--accent-soft)_0%,transparent_70%)] opacity-48"
       />
       <div
         aria-hidden="true"
-        className="ambient-orb pointer-events-none absolute bottom-[-12rem] right-[-10rem] h-[26rem] w-[26rem] rounded-full bg-[radial-gradient(circle,rgba(255,255,255,0.08)_0%,transparent_72%)] opacity-40"
+        className="ambient-orb pointer-events-none absolute bottom-[-10rem] right-[-9rem] h-[20rem] w-[20rem] rounded-full bg-[radial-gradient(circle,rgba(255,255,255,0.05)_0%,transparent_72%)] opacity-24"
       />
 
-      <div className="relative mx-auto flex max-w-[1500px] flex-col gap-5">
-        <section className="surface-panel relative overflow-hidden px-5 py-5 sm:px-6 sm:py-6">
-          <div className="pointer-events-none absolute inset-x-0 top-0 h-40 bg-[radial-gradient(circle_at_top_left,color-mix(in_srgb,var(--accent-soft)_100%,transparent),transparent_70%)] opacity-80" />
-          <div className="relative flex flex-col gap-6 lg:flex-row lg:items-start lg:justify-between">
+      <div className="relative mx-auto flex max-w-[1440px] flex-col gap-4">
+        <section className="surface-panel relative overflow-hidden px-4 py-4 sm:px-5 sm:py-5">
+          <div className="pointer-events-none absolute inset-x-0 top-0 h-28 bg-[linear-gradient(180deg,color-mix(in_srgb,var(--accent-soft)_58%,transparent),transparent_80%)] opacity-70" />
+          <div className="relative flex flex-col gap-5 lg:flex-row lg:items-start lg:justify-between">
             <div className="max-w-3xl">
               <div className="flex flex-wrap items-center gap-2">
                 <SectionBadge label="Phase 3.6" tone="success" />
                 <SectionBadge label="Phase 3.6 shell refresh" />
                 <SectionBadge label="Configuration ownership mapped" />
               </div>
-              <h1 className="mt-5 text-4xl font-semibold tracking-[-0.07em] sm:text-[3.5rem]">
+              <h1 className="mt-4 text-[2.35rem] font-semibold tracking-[-0.06em] sm:text-[2.9rem]">
                 Settings
               </h1>
-              <p className="mt-4 max-w-3xl text-[15px] leading-7 text-[color:var(--text-subtle)]">
+              <p className="mt-3 max-w-3xl text-sm leading-6 text-[color:var(--text-subtle)]">
                 One operational surface for what Nexus owns in-app, what still belongs to the deployment environment, and what remains intentionally deferred.
               </p>
 
-              <div className="mt-6 grid gap-3 md:grid-cols-3">
+              <div className="mt-5 grid gap-2.5 md:grid-cols-3">
                 <div className="hero-stat">
                   <p className="eyebrow-label">In-app</p>
-                  <p className="mt-3 text-xl font-semibold tracking-[-0.04em]">
+                  <p className="mt-2.5 text-[1.1rem] font-semibold tracking-[-0.04em]">
                     {ownership.inApp}
                   </p>
                   <p className="mt-2 text-sm leading-6 text-[color:var(--text-subtle)]">
@@ -523,7 +523,7 @@ export function SettingsWorkspace({
                 </div>
                 <div className="hero-stat">
                   <p className="eyebrow-label">Environment</p>
-                  <p className="mt-3 text-xl font-semibold tracking-[-0.04em]">
+                  <p className="mt-2.5 text-[1.1rem] font-semibold tracking-[-0.04em]">
                     {ownership.environment}
                   </p>
                   <p className="mt-2 text-sm leading-6 text-[color:var(--text-subtle)]">
@@ -532,7 +532,7 @@ export function SettingsWorkspace({
                 </div>
                 <div className="hero-stat">
                   <p className="eyebrow-label">Deferred</p>
-                  <p className="mt-3 text-xl font-semibold tracking-[-0.04em]">
+                  <p className="mt-2.5 text-[1.1rem] font-semibold tracking-[-0.04em]">
                     {ownership.deferred}
                   </p>
                   <p className="mt-2 text-sm leading-6 text-[color:var(--text-subtle)]">
@@ -542,7 +542,7 @@ export function SettingsWorkspace({
               </div>
             </div>
 
-            <div className="surface-card grid gap-2 p-4 sm:grid-cols-2 lg:w-[430px]">
+            <div className="surface-card grid gap-2 p-3.5 sm:grid-cols-2 lg:w-[392px]">
               <div className="toolbar-control">
                 <span className="eyebrow-label">Signed in as</span>
                 <span className="mt-2 block text-sm font-medium text-[color:var(--text-main)]">
@@ -575,8 +575,8 @@ export function SettingsWorkspace({
           </div>
         </section>
 
-        <section className="grid gap-5 xl:grid-cols-[1.15fr,0.85fr]">
-          <article className="surface-card p-5 sm:p-6">
+        <section className="grid gap-4 xl:grid-cols-[1.15fr,0.85fr]">
+          <article className="surface-card p-4 sm:p-5">
             <p className="eyebrow-label">Configuration Audit</p>
             <h2 className="mt-2 text-2xl font-semibold tracking-[-0.04em]">
               Ownership map
@@ -585,7 +585,7 @@ export function SettingsWorkspace({
               Every required configuration path now has a named home: in-app, environment-driven, or intentionally deferred.
             </p>
 
-            <div className="mt-5 grid gap-3 md:grid-cols-2">
+            <div className="mt-4 grid gap-2.5 md:grid-cols-2">
               {configurationAudit.map((item) => (
                 <div className="workspace-tile p-4" key={item.id}>
                   <div className="flex flex-wrap items-center gap-2">
@@ -612,13 +612,13 @@ export function SettingsWorkspace({
             </div>
           </article>
 
-          <div className="grid gap-5">
-            <article className="surface-card p-5 sm:p-6">
+          <div className="grid gap-4">
+            <article className="surface-card p-4 sm:p-5">
               <p className="eyebrow-label">Appearance</p>
               <h2 className="mt-2 text-2xl font-semibold tracking-[-0.04em]">
                 Shell preferences
               </h2>
-              <div className="mt-5 grid gap-3">
+              <div className="mt-4 grid gap-2.5">
                 <label className="block">
                   <span className="mb-2 block text-sm font-medium">Theme</span>
                   <select
@@ -680,7 +680,7 @@ export function SettingsWorkspace({
                 <MessageBanner message={appearanceMessage} />
               </div>
               <button
-                className="widget-action-button mt-4 h-11 justify-center text-sm"
+                className="widget-action-button mt-4 h-10 justify-center text-sm"
                 disabled={isSavingAppearance}
                 onClick={() => {
                   void handleAppearanceSave();
@@ -691,12 +691,12 @@ export function SettingsWorkspace({
               </button>
             </article>
 
-            <article className="surface-card p-5 sm:p-6">
+            <article className="surface-card p-4 sm:p-5">
               <p className="eyebrow-label">Operator Defaults</p>
               <h2 className="mt-2 text-2xl font-semibold tracking-[-0.04em]">
                 Behavior
               </h2>
-              <div className="mt-5 grid gap-3">
+              <div className="mt-4 grid gap-2.5">
                 <label className="block">
                   <span className="mb-2 block text-sm font-medium">
                     Default landing page
@@ -748,7 +748,7 @@ export function SettingsWorkspace({
                 <MessageBanner message={operatorMessage} />
               </div>
               <button
-                className="widget-action-button mt-4 h-11 justify-center text-sm"
+                className="widget-action-button mt-4 h-10 justify-center text-sm"
                 disabled={isSavingOperator}
                 onClick={() => {
                   void handleOperatorSave();
@@ -761,7 +761,7 @@ export function SettingsWorkspace({
           </div>
         </section>
 
-        <section className="surface-card p-5 sm:p-6">
+        <section className="surface-card p-4 sm:p-5">
           <p className="eyebrow-label">Notifications</p>
           <h2 className="mt-2 text-2xl font-semibold tracking-[-0.04em]">
             Channel readiness
@@ -770,8 +770,8 @@ export function SettingsWorkspace({
             Configure the non-secret delivery metadata now so Phase 5 alert fanout has a clean path to finish.
           </p>
 
-          <div className="mt-5 grid gap-4 xl:grid-cols-[0.9fr,1.1fr]">
-            <div className="grid gap-3">
+          <div className="mt-4 grid gap-3.5 xl:grid-cols-[0.9fr,1.1fr]">
+            <div className="grid gap-2.5">
               <ToggleField
                 checked={notificationDraft.notificationsEnabled}
                 description="Master switch for future alert delivery once the Phase 5 engine is active."
@@ -828,7 +828,7 @@ export function SettingsWorkspace({
                 <MessageBanner message={notificationMessage} />
               </div>
               <button
-                className="widget-action-button h-11 justify-center text-sm"
+                className="widget-action-button h-10 justify-center text-sm"
                 disabled={isSavingNotifications}
                 onClick={() => {
                   void handleNotificationSave();
@@ -839,7 +839,7 @@ export function SettingsWorkspace({
               </button>
             </div>
 
-            <div className="grid gap-3 md:grid-cols-2">
+            <div className="grid gap-2.5 md:grid-cols-2">
               {notificationDraft.channels.map((channel) => (
                 <article className="workspace-tile p-4" key={channel.channel}>
                   <div className="flex flex-wrap items-center gap-2">
@@ -941,7 +941,7 @@ export function SettingsWorkspace({
         </section>
 
         <section>
-          <div className="mb-4">
+          <div className="mb-3.5">
             <p className="eyebrow-label">Integrations</p>
             <h2 className="mt-2 text-2xl font-semibold tracking-[-0.04em]">
               Provider configuration
@@ -951,7 +951,7 @@ export function SettingsWorkspace({
             </p>
           </div>
 
-          <div className="grid gap-4 xl:grid-cols-2">
+          <div className="grid gap-3.5 xl:grid-cols-2">
             {integrationCards.map((detail) => (
               <IntegrationSettingsCard
                 detail={detail}

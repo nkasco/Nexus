@@ -130,21 +130,18 @@ describe('AppShell', () => {
     expect(collapseButton).not.toBeNull();
     expect(settingsLink).not.toBeNull();
     expect(getByTestId('app-sidebar')).toHaveClass(
-      'xl:w-[268px]',
+      'order-2',
+      'xl:w-[224px]',
       'workspace-sidebar',
       'surface-panel',
-      'px-3',
-      'py-3',
+      'px-2',
+      'py-2',
     );
     expect(getByTestId('nav-link-overview')).toHaveClass(
-      'px-3',
-      'rounded-[18px]',
+      'px-2',
+      'rounded-[10px]',
       'border',
     );
-    expect(container.firstChild).toHaveClass(
-      'workspace-frame',
-      'px-3',
-      'py-3',
-    );
+    expect(container.firstChild).toHaveClass('workspace-frame', 'px-2', 'py-2');
   });
 });

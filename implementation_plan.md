@@ -266,6 +266,84 @@ This file should be updated after implementation work so completed items, remain
 - The pre-existing `apps/web/scripts/dev-server.mjs` port-resolution failure is still present, so browser validation again used the direct Next.js dev command instead of the wrapper script.
 - Follow-up work introduced by this phase includes encrypting secrets at rest before allowing in-app secret editing, adding test-send flows once notification delivery exists in Phase 5, and addressing the known web dev wrapper port bug separately from the settings surface itself.
 
+## Visual Overhaul Track
+
+### Phase 0: Visual Audit and Direction Lock
+
+#### Deliverables
+
+- [x] Document current UI problems with concrete before-state notes from the live shell audit
+- [x] Record target density rules for shell padding, panel padding, row height, and radius
+- [x] Define the visual thesis, content plan, and interaction thesis for the app shell
+- [x] Establish a small set of reference principles for sidebar, toolbar, widgets, forms, and settings
+- [x] Capture implementation guardrails so the overhaul stays Notion-first instead of drifting back toward glossy dashboard chrome
+
+#### Exit Criteria
+
+- [x] The overhaul has a written style direction and measurable density targets
+- [x] The implementation path is specific enough that no major visual decisions are deferred
+
+#### Notes
+
+- `visual_overhaul_plan.md` now includes the locked before-state audit, explicit density targets, component-level principles, and implementation guardrails for the redesign track.
+- The documented current-state measurements are grounded in the live audit plus the current frontend token and layout code: `268px` sidebar width, `28px` shell and route-hero radii, `24px` card radius, `62px` toolbar controls, and repeated gradient-plus-blur surface styling across the shell.
+- Phase 0 sets the target direction as a Notion-first dark workspace with macOS polish used sparingly for typography and motion, and it defines the first-pass target density for sidebar width, card radius, control height, gutters, and padding before visual implementation begins.
+- Playwright MCP was used to recheck the live shell during this pass: desktop `/overview`, `/media`, and `/settings` were reviewed, the login screen was revalidated after sign-out, and a `390x844` mobile pass on `/overview` confirmed that the current shell chrome still buries the first widget several screens down.
+
+### Phase 1: Core Visual System Reset
+
+#### Deliverables
+
+- [x] Redefine color tokens around muted neutrals with one restrained accent and reduced ambient gradients
+- [x] Reduce shell, panel, card, input, button, and badge radii across the application
+- [x] Tighten spacing tokens so outer gutters, section gaps, and component padding are materially smaller
+- [x] Rework typography scale and weights for clearer hierarchy with less oversized display treatment
+- [x] Simplify shadows, borders, and blur so surfaces read flatter and more document-like
+- [x] Standardize motion to a few subtle transitions for reveal, hover, and state change
+
+#### Exit Criteria
+
+- [x] The base token system alone makes the shell feel denser and calmer before route-specific polish
+- [x] Light and dark themes no longer depend on glossy gradients or inflated panel styling
+
+#### Notes
+
+- Phase 1 landed as a shared frontend token and density reset across the web shell, widgets, login, notifications, and settings surfaces, without yet changing the higher-level shell composition planned for Phase 2.
+- The reset moved the visual language toward quieter Notion-like neutrals, flatter matte panels, smaller radii, tighter paddings, lighter shadows, reduced blur, and calmer motion timings.
+- Shared radii now center on `16px` shell panels, `14px` cards, `12px` secondary groupings, and `10px` inputs and action buttons, while page gutters and internal spacing were reduced across the authenticated shell and supporting routes.
+- The overview sidebar was reduced from `268px` to `248px`, and typography was tightened across the app so route headers, widget titles, login copy, and settings headings no longer rely on oversized display styling.
+- Playwright MCP review on a fresh `next dev -p 3200` session confirmed the denser baseline: desktop `/overview` moved the first widget row from roughly `777px` down to roughly `668px`, and mobile `/overview` moved it from roughly `2258px` down to roughly `1835px` while also reducing the mobile sidebar block and route hero heights.
+- `npm run typecheck --workspace @nexus/web`, `npm run lint --workspace @nexus/web`, `npm run test --workspace @nexus/web`, and `npm run build --workspace @nexus/web` all passed after the Phase 1 reset. The build still emits the existing Next.js ESLint-plugin warning, but it does not fail the build.
+- Browser validation against the long-lived `localhost:3000` dev server hit a pre-existing stale Next module/HMR runtime issue, so the final Playwright review used a fresh server on `3200` instead.
+- Follow-up work introduced by this phase includes further compressing the sidebar and route-header stack in Phase 2, continuing to reduce top-of-page meta framing on mobile, and fixing the persistent stale-module local dev-server issue so browser validation can rely on the default port again.
+
+### Phase 2: Shell and Navigation Overhaul
+
+#### Deliverables
+
+- [x] Narrow and densify the sidebar, including nav row height, icon containers, internal padding, and footer actions
+- [x] Rework the main route header into a compact workspace toolbar instead of a large hero
+- [x] Remove or compress redundant meta tiles near the top of each route
+- [x] Make the first viewport show more actual work surface and fewer ornamental wrappers
+- [x] Restyle the notification center so it matches the flatter shell language
+- [x] Adjust the mobile shell so the sidebar and top framing consume less vertical space before content begins
+
+#### Exit Criteria
+
+- [x] Overview reaches meaningful widget content much sooner on desktop and mobile
+- [x] The sidebar feels closer to a source list than a large docked panel
+
+#### Notes
+
+- Phase 2 focused the web-shell composition in `apps/web/src/components/app-shell.tsx` and `apps/web/src/components/notification-center.tsx` rather than broadening product scope: the authenticated shell now opens on a compact toolbar-style route header, a denser left rail, and a flatter notification tray.
+- The desktop sidebar now sits at `224px` wide instead of `248px`, nav rows are down to roughly `55px` tall with smaller icon wells, and the previous sidebar session card plus top-of-page four-tile meta block were compressed into lighter inline status treatment.
+- The old large route hero was replaced with a smaller workspace toolbar that keeps section identity, unread state, session state, and appearance controls together without burning most of the first viewport on framing chrome.
+- Mobile now surfaces the primary workspace first and pushes the full sidebar stack below the main content flow, which materially changes the handheld experience from shell-first to work-first without removing the navigation rail entirely.
+- Playwright MCP review on a fresh `next dev -p 3200` session confirmed the density gain: desktop `/overview` now reaches the first widget at roughly `325px` from the top of the viewport instead of `668px`, while the `390x844` mobile pass reaches the first widget at roughly `673px` instead of `1835px` and keeps that first widget visible inside the opening viewport.
+- Playwright also revalidated `/media` and `/settings` on the same fresh dev session after the shell changes, and the notification tray now renders at about `340px` wide in the compact shell instead of the previous larger overlay footprint.
+- `npm run typecheck --workspace @nexus/web`, `npm run lint --workspace @nexus/web`, `npm run test --workspace @nexus/web`, and `npm run build --workspace @nexus/web` all passed after the Phase 2 work. The build still emits the existing Next.js ESLint-plugin warning, but it does not fail the build.
+- The current red item remains local Next.js dev-session stability: the long-lived `localhost:3000` flow is still unreliable, and even the direct dev server on `3200` must be restarted if `next build` and `next dev` touch `.next` at the same time. Follow-up work introduced by this phase includes tightening the remaining mobile route-toolbar height during Phase 3 and resolving the local `.next` artifact contention so browser validation can use a stable default dev path again.
+
 ## Phase 3.6: UI Overhaul and Interaction Polish
 
 ### Objectives

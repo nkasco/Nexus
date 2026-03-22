@@ -108,25 +108,25 @@ export function WidgetFrame({
   return (
     <article
       className={clsx(
-        'widget-shell surface-card flex min-h-[300px] flex-col p-5 sm:p-6',
+        'widget-shell surface-card flex min-h-[280px] flex-col p-4 sm:p-5',
         className,
       )}
       data-state={state}
     >
-      <div className="flex flex-col gap-5 border-b border-[color:var(--border-soft)] pb-5">
-        <div className="flex flex-col gap-4 xl:flex-row xl:items-start xl:justify-between">
+      <div className="flex flex-col gap-4 border-b border-[color:var(--border-soft)] pb-4">
+        <div className="flex flex-col gap-3 xl:flex-row xl:items-start xl:justify-between">
           <div className="min-w-0">
             <p className="eyebrow-label">{eyebrow}</p>
-            <h3 className="mt-3 text-[1.85rem] font-semibold tracking-[-0.05em] text-[color:var(--text-main)]">
+            <h3 className="mt-2.5 text-[1.55rem] font-semibold tracking-[-0.05em] text-[color:var(--text-main)]">
               {title}
             </h3>
           </div>
 
-          <div className="flex flex-col items-start gap-3 xl:items-end">
+          <div className="flex flex-col items-start gap-2.5 xl:items-end">
             {metric ? (
               <div
                 className={clsx(
-                  'rounded-full border px-3 py-1 text-xs font-medium uppercase tracking-[0.15em]',
+                  'rounded-[10px] border px-2.5 py-1 text-[11px] font-medium uppercase tracking-[0.1em]',
                   toneSurfaceClass(state === 'ready' ? tone : 'default'),
                   state === 'ready' ? toneClass(tone) : toneClass('default'),
                 )}
@@ -205,7 +205,7 @@ export function WidgetFrame({
         </p>
       </div>
 
-      <div className="mt-5 flex flex-1 flex-col justify-between">
+      <div className="mt-4 flex flex-1 flex-col justify-between">
         {fallback ? (
           <div className="widget-stat-block">
             <p className={clsx('text-sm font-medium', fallback.toneClass)}>
@@ -216,9 +216,9 @@ export function WidgetFrame({
             </p>
           </div>
         ) : (
-          <div className="space-y-4">
+          <div className="space-y-3.5">
             {stats && stats.length > 0 ? (
-              <div className="grid gap-3 lg:grid-cols-3">
+              <div className="grid gap-2.5 lg:grid-cols-3">
                 {stats.map((entry) => (
                   <div
                     className={clsx('widget-stat-block', toneSurfaceClass(entry.tone))}
@@ -227,7 +227,7 @@ export function WidgetFrame({
                     <p className="eyebrow-label">{entry.label}</p>
                     <p
                       className={clsx(
-                        'mt-3 text-xl font-semibold tracking-[-0.04em]',
+                        'mt-2.5 text-[1.1rem] font-semibold tracking-[-0.04em]',
                         toneClass(entry.tone),
                       )}
                     >
@@ -244,7 +244,7 @@ export function WidgetFrame({
             ) : null}
 
             {items && items.length > 0 ? (
-              <div className="space-y-2.5">
+              <div className="space-y-2">
                 {items.map((entry) => (
                   <div
                     className={clsx('widget-list-row', toneSurfaceClass(entry.tone))}
@@ -273,11 +273,11 @@ export function WidgetFrame({
               </div>
             ) : null}
 
-            {children ? <div className="space-y-3">{children}</div> : null}
+            {children ? <div className="space-y-2.5">{children}</div> : null}
           </div>
         )}
 
-        <div className="mt-6 flex flex-col gap-2 border-t border-[color:var(--border-soft)] pt-4 text-sm leading-7 text-[color:var(--text-subtle)] sm:flex-row sm:items-center sm:justify-between sm:gap-4">
+        <div className="mt-5 flex flex-col gap-2 border-t border-[color:var(--border-soft)] pt-3 text-sm leading-6 text-[color:var(--text-subtle)] sm:flex-row sm:items-center sm:justify-between sm:gap-4">
           <p className="eyebrow-label">Current snapshot</p>
           {updatedLabel ? (
             <p className="whitespace-nowrap text-xs uppercase tracking-[0.16em] text-[color:var(--text-muted)]">
