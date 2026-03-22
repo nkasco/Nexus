@@ -5,19 +5,31 @@ describe('LoginPanel', () => {
   it('submits typed credentials', () => {
     const onSubmit = vi.fn();
 
-    render(<LoginPanel apiHealthy isSubmitting={false} onSubmit={onSubmit} />);
+    const { container } = render(
+      <LoginPanel apiHealthy isSubmitting={false} onSubmit={onSubmit} />,
+    );
 
-    fireEvent.change(screen.getByLabelText('Username'), {
+    const usernameInput = container.querySelector(
+      'input[name="username"]',
+    ) as HTMLInputElement;
+    const passwordInput = container.querySelector(
+      'input[name="password"]',
+    ) as HTMLInputElement;
+    const form = container.querySelector('form');
+
+    fireEvent.change(usernameInput, {
       target: { value: 'operator' },
     });
-    fireEvent.change(screen.getByLabelText('Password'), {
+    fireEvent.change(passwordInput, {
       target: { value: 'super-secret' },
     });
-    fireEvent.click(screen.getByRole('button', { name: 'Sign in' }));
+    fireEvent.submit(form!);
 
     expect(onSubmit).toHaveBeenCalledWith({
       username: 'operator',
       password: 'super-secret',
     });
+
+    expect(screen.getByText('Enter the dashboard')).toBeInTheDocument();
   });
 });

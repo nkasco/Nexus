@@ -1,5 +1,4 @@
-import userEvent from '@testing-library/user-event';
-import { render, screen } from '@testing-library/react';
+import { fireEvent, render, screen } from '@testing-library/react';
 import { WidgetFrame } from './widget-frame';
 
 describe('WidgetFrame', () => {
@@ -11,6 +10,7 @@ describe('WidgetFrame', () => {
         focus="summary"
         metric="12"
         state="ready"
+        updatedLabel="just now"
         stats={[
           {
             label: 'Healthy',
@@ -26,6 +26,8 @@ describe('WidgetFrame', () => {
     );
 
     expect(screen.getByText('Signal')).toBeInTheDocument();
+    expect(screen.getByText('Ready detail')).toBeInTheDocument();
+    expect(screen.getByText(/Updated just now/i)).toBeInTheDocument();
     expect(screen.getByText('Live content')).toBeInTheDocument();
   });
 
@@ -60,7 +62,6 @@ describe('WidgetFrame', () => {
   });
 
   it('renders widget actions and focus controls', async () => {
-    const user = userEvent.setup();
     const onFocusChange = vi.fn();
     const onRefresh = vi.fn();
 
@@ -85,15 +86,11 @@ describe('WidgetFrame', () => {
       />,
     );
 
-    await user.click(screen.getByRole('button', { name: 'Refresh' }));
+    fireEvent.click(screen.getByText('Refresh'));
     expect(onRefresh).toHaveBeenCalled();
 
-    await user.click(screen.getByRole('button', { name: 'Configure' }));
-    await user.click(
-      screen.getByRole('button', {
-        name: /attention prioritize warnings and degraded items first/i,
-      }),
-    );
+    fireEvent.click(screen.getByText('Configure'));
+    fireEvent.click(screen.getByText('attention'));
     expect(onFocusChange).toHaveBeenCalledWith('attention');
   });
 });

@@ -68,7 +68,7 @@ function ToggleField({
   onChange: (checked: boolean) => void;
 }) {
   return (
-    <label className="surface-muted flex items-start justify-between gap-4 p-4">
+    <label className="workspace-tile flex items-start justify-between gap-4 p-4">
       <span className="min-w-0">
         <span className="block text-sm font-medium text-[color:var(--text-main)]">
           {label}
@@ -79,7 +79,7 @@ function ToggleField({
       </span>
       <input
         checked={checked}
-        className="mt-1 h-4 w-4 accent-[color:var(--accent-strong)]"
+        className="mt-1 h-4 w-4 shrink-0 accent-[color:var(--accent-strong)]"
         onChange={(event) => onChange(event.target.checked)}
         type="checkbox"
       />
@@ -101,7 +101,7 @@ function MessageBanner({
   return (
     <div
       className={clsx(
-        'surface-muted px-4 py-3 text-sm',
+        'workspace-tile px-4 py-3 text-sm',
         error
           ? 'text-[color:var(--danger-strong)]'
           : 'text-[color:var(--text-subtle)]',
@@ -317,7 +317,7 @@ function IntegrationSettingsCard({
             </p>
           </div>
           {environmentCredentials.map((credential) => (
-            <div className="surface-muted p-4" key={credential.key}>
+            <div className="workspace-tile p-4" key={credential.key}>
               <div className="flex flex-wrap items-center gap-2">
                 <span className="text-sm font-medium">{credential.label}</span>
                 <SectionBadge
@@ -484,24 +484,65 @@ export function SettingsWorkspace({
   }
 
   return (
-    <main className="min-h-screen px-4 py-4 text-[color:var(--text-main)] sm:px-6">
-      <div className="mx-auto flex max-w-7xl flex-col gap-4">
-        <section className="surface-panel px-5 py-5 sm:px-6">
-          <div className="flex flex-col gap-5 lg:flex-row lg:items-start lg:justify-between">
+    <main className="relative min-h-screen overflow-hidden px-4 py-4 text-[color:var(--text-main)] sm:px-6 sm:py-6">
+      <div
+        aria-hidden="true"
+        className="ambient-orb pointer-events-none absolute left-[-12rem] top-[-8rem] h-[28rem] w-[28rem] rounded-full bg-[radial-gradient(circle,var(--accent-soft)_0%,transparent_70%)] opacity-80"
+      />
+      <div
+        aria-hidden="true"
+        className="ambient-orb pointer-events-none absolute bottom-[-12rem] right-[-10rem] h-[26rem] w-[26rem] rounded-full bg-[radial-gradient(circle,rgba(255,255,255,0.08)_0%,transparent_72%)] opacity-40"
+      />
+
+      <div className="relative mx-auto flex max-w-[1500px] flex-col gap-5">
+        <section className="surface-panel relative overflow-hidden px-5 py-5 sm:px-6 sm:py-6">
+          <div className="pointer-events-none absolute inset-x-0 top-0 h-40 bg-[radial-gradient(circle_at_top_left,color-mix(in_srgb,var(--accent-soft)_100%,transparent),transparent_70%)] opacity-80" />
+          <div className="relative flex flex-col gap-6 lg:flex-row lg:items-start lg:justify-between">
             <div className="max-w-3xl">
               <div className="flex flex-wrap items-center gap-2">
-                <SectionBadge label="Phase 3.5" tone="success" />
+                <SectionBadge label="Phase 3.6" tone="success" />
+                <SectionBadge label="Phase 3.6 shell refresh" />
                 <SectionBadge label="Configuration ownership mapped" />
               </div>
-              <h1 className="mt-4 text-4xl font-semibold tracking-[-0.05em] sm:text-[3rem]">
+              <h1 className="mt-5 text-4xl font-semibold tracking-[-0.07em] sm:text-[3.5rem]">
                 Settings
               </h1>
-              <p className="mt-3 max-w-2xl text-[15px] leading-7 text-[color:var(--text-subtle)]">
-                One place to manage what Nexus owns in-app, what still belongs in the deployment environment, and what remains deferred for later phases.
+              <p className="mt-4 max-w-3xl text-[15px] leading-7 text-[color:var(--text-subtle)]">
+                One operational surface for what Nexus owns in-app, what still belongs to the deployment environment, and what remains intentionally deferred.
               </p>
+
+              <div className="mt-6 grid gap-3 md:grid-cols-3">
+                <div className="hero-stat">
+                  <p className="eyebrow-label">In-app</p>
+                  <p className="mt-3 text-xl font-semibold tracking-[-0.04em]">
+                    {ownership.inApp}
+                  </p>
+                  <p className="mt-2 text-sm leading-6 text-[color:var(--text-subtle)]">
+                    Managed directly through Nexus.
+                  </p>
+                </div>
+                <div className="hero-stat">
+                  <p className="eyebrow-label">Environment</p>
+                  <p className="mt-3 text-xl font-semibold tracking-[-0.04em]">
+                    {ownership.environment}
+                  </p>
+                  <p className="mt-2 text-sm leading-6 text-[color:var(--text-subtle)]">
+                    Still deployment-managed for safety or secret handling.
+                  </p>
+                </div>
+                <div className="hero-stat">
+                  <p className="eyebrow-label">Deferred</p>
+                  <p className="mt-3 text-xl font-semibold tracking-[-0.04em]">
+                    {ownership.deferred}
+                  </p>
+                  <p className="mt-2 text-sm leading-6 text-[color:var(--text-subtle)]">
+                    Explicitly held for a later product phase.
+                  </p>
+                </div>
+              </div>
             </div>
 
-            <div className="grid gap-2 sm:grid-cols-2 lg:w-[420px]">
+            <div className="surface-card grid gap-2 p-4 sm:grid-cols-2 lg:w-[430px]">
               <div className="toolbar-control">
                 <span className="eyebrow-label">Signed in as</span>
                 <span className="mt-2 block text-sm font-medium text-[color:var(--text-main)]">
@@ -534,17 +575,19 @@ export function SettingsWorkspace({
           </div>
         </section>
 
-        <section className="grid gap-4 xl:grid-cols-[1.2fr,0.8fr]">
-          <article className="surface-card p-5">
+        <section className="grid gap-5 xl:grid-cols-[1.15fr,0.85fr]">
+          <article className="surface-card p-5 sm:p-6">
             <p className="eyebrow-label">Configuration Audit</p>
-            <h2 className="mt-2 text-2xl font-semibold">Ownership map</h2>
+            <h2 className="mt-2 text-2xl font-semibold tracking-[-0.04em]">
+              Ownership map
+            </h2>
             <p className="mt-2 text-sm leading-6 text-[color:var(--text-subtle)]">
               Every required configuration path now has a named home: in-app, environment-driven, or intentionally deferred.
             </p>
 
             <div className="mt-5 grid gap-3 md:grid-cols-2">
               {configurationAudit.map((item) => (
-                <div className="surface-muted p-4" key={item.id}>
+                <div className="workspace-tile p-4" key={item.id}>
                   <div className="flex flex-wrap items-center gap-2">
                     <p className="text-sm font-medium">{item.label}</p>
                     <SectionBadge
@@ -569,10 +612,12 @@ export function SettingsWorkspace({
             </div>
           </article>
 
-          <div className="grid gap-4">
-            <article className="surface-card p-5">
+          <div className="grid gap-5">
+            <article className="surface-card p-5 sm:p-6">
               <p className="eyebrow-label">Appearance</p>
-              <h2 className="mt-2 text-2xl font-semibold">Shell preferences</h2>
+              <h2 className="mt-2 text-2xl font-semibold tracking-[-0.04em]">
+                Shell preferences
+              </h2>
               <div className="mt-5 grid gap-3">
                 <label className="block">
                   <span className="mb-2 block text-sm font-medium">Theme</span>
@@ -646,9 +691,11 @@ export function SettingsWorkspace({
               </button>
             </article>
 
-            <article className="surface-card p-5">
+            <article className="surface-card p-5 sm:p-6">
               <p className="eyebrow-label">Operator Defaults</p>
-              <h2 className="mt-2 text-2xl font-semibold">Behavior</h2>
+              <h2 className="mt-2 text-2xl font-semibold tracking-[-0.04em]">
+                Behavior
+              </h2>
               <div className="mt-5 grid gap-3">
                 <label className="block">
                   <span className="mb-2 block text-sm font-medium">
@@ -714,9 +761,11 @@ export function SettingsWorkspace({
           </div>
         </section>
 
-        <section className="surface-card p-5">
+        <section className="surface-card p-5 sm:p-6">
           <p className="eyebrow-label">Notifications</p>
-          <h2 className="mt-2 text-2xl font-semibold">Channel readiness</h2>
+          <h2 className="mt-2 text-2xl font-semibold tracking-[-0.04em]">
+            Channel readiness
+          </h2>
           <p className="mt-2 text-sm leading-6 text-[color:var(--text-subtle)]">
             Configure the non-secret delivery metadata now so Phase 5 alert fanout has a clean path to finish.
           </p>
@@ -792,7 +841,7 @@ export function SettingsWorkspace({
 
             <div className="grid gap-3 md:grid-cols-2">
               {notificationDraft.channels.map((channel) => (
-                <article className="surface-muted p-4" key={channel.channel}>
+                <article className="workspace-tile p-4" key={channel.channel}>
                   <div className="flex flex-wrap items-center gap-2">
                     <p className="text-sm font-medium">{channel.label}</p>
                     <SectionBadge
@@ -894,7 +943,9 @@ export function SettingsWorkspace({
         <section>
           <div className="mb-4">
             <p className="eyebrow-label">Integrations</p>
-            <h2 className="mt-2 text-2xl font-semibold">Provider configuration</h2>
+            <h2 className="mt-2 text-2xl font-semibold tracking-[-0.04em]">
+              Provider configuration
+            </h2>
             <p className="mt-2 text-sm leading-6 text-[color:var(--text-subtle)]">
               Each adapter now exposes enablement, cadence, and non-secret connection controls in one place.
             </p>

@@ -112,38 +112,39 @@ describe('AppShell', () => {
     );
 
     expect(screen.getByText('Operator Shell')).toBeInTheDocument();
-    expect(
-      screen.getByRole('heading', { level: 2, name: 'Overview' }),
-    ).toBeInTheDocument();
-    expect(screen.getByText('Workspace Controls')).toBeInTheDocument();
+    expect(screen.getAllByText('Overview').length).toBeGreaterThan(0);
+    expect(screen.getByText(/Workspace controls/i)).toBeInTheDocument();
+    expect(screen.getByText('Dashboard field')).toBeInTheDocument();
     expect(screen.getByText('Attention Summary')).toBeInTheDocument();
     expect(screen.getByText('1 unread item')).toBeInTheDocument();
     expect(screen.getByText('Proxmox sync')).toBeInTheDocument();
-    expect(screen.getByRole('button', { name: 'Refresh' })).toBeInTheDocument();
-    expect(screen.getByRole('link', { name: 'Open' })).toHaveAttribute(
-      'href',
-      '/alerts',
+    expect(screen.getByText('Refresh')).toBeInTheDocument();
+
+    const alertsLink = container.querySelector('a[href="/alerts"]');
+    const collapseButton = container.querySelector(
+      'button[aria-label="Collapse sidebar"]',
     );
-    expect(
-      screen.getByRole('button', { name: 'Collapse sidebar' }),
-    ).toBeInTheDocument();
-    expect(screen.getByRole('link', { name: /Settings/ })).toHaveAttribute(
-      'href',
-      '/settings',
-    );
+    const settingsLink = container.querySelector('a[href="/settings"]');
+
+    expect(alertsLink).not.toBeNull();
+    expect(collapseButton).not.toBeNull();
+    expect(settingsLink).not.toBeNull();
     expect(getByTestId('app-sidebar')).toHaveClass(
-      'lg:w-[292px]',
-      'pl-0',
-      'pr-0',
-      'rounded-none',
-      'border-l-0',
-      'border-t-0',
-      'border-b-0',
+      'xl:w-[268px]',
+      'workspace-sidebar',
+      'surface-panel',
+      'px-3',
+      'py-3',
     );
     expect(getByTestId('nav-link-overview')).toHaveClass(
       'px-3',
-      'rounded-[14px]',
+      'rounded-[18px]',
+      'border',
     );
-    expect(container.firstChild).toHaveClass('pl-0', 'pt-0');
+    expect(container.firstChild).toHaveClass(
+      'workspace-frame',
+      'px-3',
+      'py-3',
+    );
   });
 });

@@ -266,6 +266,60 @@ This file should be updated after implementation work so completed items, remain
 - The pre-existing `apps/web/scripts/dev-server.mjs` port-resolution failure is still present, so browser validation again used the direct Next.js dev command instead of the wrapper script.
 - Follow-up work introduced by this phase includes encrypting secrets at rest before allowing in-app secret editing, adding test-send flows once notification delivery exists in Phase 5, and addressing the known web dev wrapper port bug separately from the settings surface itself.
 
+## Phase 3.6: UI Overhaul and Interaction Polish
+
+### Objectives
+
+- Recompose the authenticated shell so the first impression feels deliberate, premium, and operational instead of visually inconsistent or over-treated.
+- Tighten the page hierarchy around a stronger visual thesis: matte editorial surfaces, calmer navigation, denser dashboard rhythm, and clearer page-level orientation.
+- Normalize the UI language across login, dashboard, notification, widget, and settings surfaces so the product reads as one coherent workspace.
+
+### Visual Thesis
+
+- A restrained operator workspace with matte graphite surfaces, warm-metal accents, sharper typography contrast, and a poster-like first viewport instead of stacked utility boxes.
+
+### Content Plan
+
+- Hero/workspace frame: section identity, platform status, and the most important operator controls.
+- Support layer: persistent navigation, activity context, and global system posture.
+- Detail layer: widgets and settings content presented with clearer scanning rhythm and fewer competing chrome treatments.
+- Final CTA layer: sign-in, open settings, and widget navigation remain prominent without dominating the surface.
+
+### Interaction Thesis
+
+- Introduce a stronger page-entry sequence so the shell, hero, and widget field arrive with intentional staging.
+- Add restrained hover and focus transitions that sharpen affordance rather than adding decorative motion.
+- Improve side-panel and workspace transitions so navigation collapse, notification reveal, and widget controls feel calmer and more native.
+
+### Deliverables
+
+- [x] Redefine the core web design tokens in `apps/web/src/app/globals.css` around cleaner depth, typography, spacing, and accent discipline
+- [x] Rebuild the authenticated shell composition in `apps/web/src/components/app-shell.tsx` to improve hierarchy, spacing, and page-level orientation
+- [x] Refresh the shared widget presentation in `apps/web/src/components/widget-frame.tsx` so data density feels intentional without relying on generic card styling
+- [x] Redesign the login surface in `apps/web/src/components/login-panel.tsx` so it matches the product direction and no longer reads like a placeholder marketing split
+- [x] Refine the notification and settings surfaces so overlays and control-heavy views share the same visual system as the main shell
+- [x] Update or add frontend unit tests to cover the new UI structure and key interaction affordances touched by the overhaul
+- [x] Validate the affected web command path with `npm run typecheck --workspace @nexus/web`, `npm run lint --workspace @nexus/web`, `npm run test --workspace @nexus/web`, and `npm run build --workspace @nexus/web`
+
+### Exit Criteria
+
+- [x] The login, shell, widget, notification, and settings surfaces read as one cohesive product UI instead of adjacent styling passes
+- [x] The first viewport on primary authenticated routes has a clear visual anchor, concise hierarchy, and reliable mobile/desktop behavior
+- [x] Updated unit tests cover the changed structure and critical interactions for the redesigned surfaces
+- [x] The relevant web validation commands pass after the overhaul
+
+### Phase 3.6 Notes
+
+- Phase 3.6 rebuilt the shared web surface language around warmer graphite neutrals, restrained gold and aurora accents, cleaner panel depth, calmer borders, and stronger top-of-page hierarchy so the product reads more like a purpose-built operator workspace than a stack of mismatched cards.
+- The authenticated shell now uses a more deliberate sidebar, a stronger route hero, tighter workspace controls, and clearer top-level status framing, while the shared widget frame now presents metrics, details, and focus actions with denser but more intentional structure.
+- The login experience, notification tray, and settings workspace were redesigned onto the same system so pre-auth, overlay, and configuration-heavy views no longer look like separate styling passes.
+- Frontend tests were updated for the revised shell and widget structure, including the redesigned app shell assertions and the widget snapshot footer behavior.
+- `npm run lint --workspace @nexus/web`, `npm run test --workspace @nexus/web`, `npm run typecheck --workspace @nexus/web`, and `npm run build --workspace @nexus/web` all passed after the overhaul work.
+- Playwright validation confirmed the redesigned authenticated `/overview` workspace and `/settings` configuration surface render successfully when the API is running on port `4000` and the web app is served through the direct Next.js dev entrypoint.
+- The Playwright dev-session console still showed the existing `favicon.ico` 404 in the Next.js development environment.
+- `npm run build --workspace @nexus/web` completed successfully but still emitted the existing Next.js warning that the Next ESLint plugin was not detected in the current ESLint configuration.
+- Follow-up work introduced by this phase includes adding dedicated end-to-end coverage for the login and dashboard flow, addressing the development-only `favicon.ico` 404, and reconciling the current ESLint setup with Next.js plugin detection expectations.
+
 ## Phase 4: Historical Metrics, Graphs, and KPI Rollups
 
 ### Objectives

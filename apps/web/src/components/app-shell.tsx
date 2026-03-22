@@ -117,10 +117,10 @@ function widgetSpanClass(widget: WidgetView, compactMode: boolean) {
   }
 
   if (widget.columnSpan >= 2) {
-    return 'col-span-12 xl:col-span-6';
+    return 'col-span-12 2xl:col-span-6';
   }
 
-  return 'col-span-12 md:col-span-6 xl:col-span-3';
+  return 'col-span-12 md:col-span-6 2xl:col-span-4';
 }
 
 function lastEventLabel(lastEventAt: string | null, use24HourTime: boolean) {
@@ -229,7 +229,7 @@ export function AppShell({
   const connectionTone = statusTone(health, websocketStatus);
 
   return (
-    <main className="min-h-screen pb-4 pl-0 pr-4 pt-0 text-[color:var(--text-main)] sm:pr-6">
+    <main className="workspace-frame min-h-screen px-3 py-3 text-[color:var(--text-main)] sm:px-5 sm:py-5">
       <NotificationCenter
         isOpen={isNotificationCenterOpen}
         items={notifications}
@@ -237,28 +237,27 @@ export function AppShell({
         unreadCount={unreadCount}
       />
 
-      <div className="grid min-h-screen max-w-none gap-4 lg:grid-cols-[292px_minmax(0,1fr)]">
+      <div className="grid min-h-[calc(100vh-1.5rem)] gap-3 xl:grid-cols-[268px_minmax(0,1fr)]">
         <aside
           data-testid="app-sidebar"
           className={clsx(
-            'surface-panel flex min-h-screen flex-col overflow-hidden rounded-none border-l-0 border-t-0 border-b-0 py-3 pl-0 pr-0 pt-0 transition-all duration-300',
-            preferences.sidebarCollapsed ? 'lg:w-[96px]' : 'lg:w-[292px]',
+            'workspace-sidebar surface-panel flex flex-col overflow-hidden px-3 py-3 transition-all duration-300',
+            preferences.sidebarCollapsed ? 'xl:w-[98px]' : 'xl:w-[268px]',
           )}
-          style={{ background: 'var(--shell-sidebar)' }}
         >
-          <div className="flex items-center gap-3 border-b border-[color:var(--border-soft)] pb-4 pl-4 pr-2 pt-4">
-            <div className="flex h-10 w-10 items-center justify-center rounded-[12px] border border-[color:var(--border-soft)] bg-[color:var(--panel-subtle)] text-sm font-semibold text-[color:var(--text-main)]">
+          <div className="flex items-center gap-3 border-b border-[color:var(--border-soft)] px-2 pb-4">
+            <div className="flex h-11 w-11 items-center justify-center rounded-[15px] border border-[color:var(--accent-outline)] bg-[color:var(--accent-soft)] text-base font-semibold text-[color:var(--text-main)]">
               N
             </div>
 
             <div
               className={clsx(
                 'min-w-0 flex-1 transition-opacity',
-                preferences.sidebarCollapsed && 'lg:hidden',
+                preferences.sidebarCollapsed && 'xl:hidden',
               )}
             >
               <p className="eyebrow-label">Nexus</p>
-              <h1 className="mt-1 text-[1.7rem] font-semibold tracking-[-0.03em]">
+              <h1 className="mt-1 text-[1.45rem] font-semibold tracking-[-0.04em]">
                 Operator Shell
               </h1>
             </div>
@@ -269,7 +268,7 @@ export function AppShell({
                   ? 'Expand sidebar'
                   : 'Collapse sidebar'
               }
-              className="flex h-10 w-10 items-center justify-center rounded-[12px] border border-[color:var(--border-soft)] bg-[color:var(--panel-subtle)] text-[color:var(--text-subtle)] transition hover:border-[color:var(--border-strong)] hover:bg-[color:var(--panel-muted)] hover:text-[color:var(--text-main)]"
+              className="flex h-10 w-10 items-center justify-center rounded-[14px] border border-[color:var(--border-soft)] bg-[color:var(--panel-subtle)] text-[color:var(--text-subtle)] transition hover:border-[color:var(--border-strong)] hover:bg-[color:var(--panel-muted)] hover:text-[color:var(--text-main)]"
               onClick={onSidebarToggle}
               type="button"
             >
@@ -279,7 +278,56 @@ export function AppShell({
             </button>
           </div>
 
-          <nav aria-label="Primary" className="mt-3 flex-1 px-2">
+          <div
+            className={clsx(
+              'workspace-tile mt-4 px-4 py-4',
+              preferences.sidebarCollapsed && 'xl:px-3',
+            )}
+          >
+            <div className="flex items-center gap-2">
+              <span
+                className={clsx(
+                  'status-dot',
+                  connectionTone === 'healthy' &&
+                    'bg-[color:var(--success-strong)]',
+                  connectionTone === 'offline' &&
+                    'bg-[color:var(--danger-strong)]',
+                  connectionTone === 'pending' &&
+                    'bg-[color:var(--warning-strong)]',
+                )}
+              />
+              <p
+                className={clsx(
+                  'text-sm font-medium',
+                  preferences.sidebarCollapsed && 'xl:hidden',
+                )}
+              >
+                {userName}
+              </p>
+            </div>
+            <div
+              className={clsx(
+                'mt-3 space-y-2',
+                preferences.sidebarCollapsed && 'xl:hidden',
+              )}
+            >
+              <p className="eyebrow-label">Session status</p>
+              <p className="text-sm leading-6 text-[color:var(--text-subtle)]">
+                {statusLabel(health, websocketStatus)}
+              </p>
+            </div>
+          </div>
+
+          <nav aria-label="Primary" className="mt-5 flex-1 px-1">
+            <div
+              className={clsx(
+                'mb-3 px-2',
+                preferences.sidebarCollapsed && 'xl:hidden',
+              )}
+            >
+              <p className="eyebrow-label">Workspace</p>
+            </div>
+
             <ul className="space-y-1.5">
               {dashboardSections.map((item) => {
                 const isActive = item.slug === section;
@@ -289,16 +337,16 @@ export function AppShell({
                     <Link
                       data-testid={`nav-link-${item.slug}`}
                       className={clsx(
-                        'group flex items-center gap-3 rounded-[14px] px-3 py-2.5 transition',
+                        'group flex items-center gap-3 rounded-[18px] border px-3 py-3 transition duration-200',
                         isActive
-                          ? 'bg-[color:var(--accent-soft)] text-[color:var(--text-main)]'
-                          : 'text-[color:var(--text-subtle)] hover:bg-[color:var(--panel-muted)] hover:text-[color:var(--text-main)]',
+                          ? 'border-[color:var(--accent-outline)] bg-[color:var(--accent-soft)] text-[color:var(--text-main)]'
+                          : 'border-transparent text-[color:var(--text-subtle)] hover:border-[color:var(--border-soft)] hover:bg-[color:var(--panel-subtle)] hover:text-[color:var(--text-main)]',
                       )}
                       href={`/${item.slug}`}
                     >
                       <span
                         className={clsx(
-                          'flex h-9 w-9 shrink-0 items-center justify-center rounded-[10px] border',
+                          'flex h-10 w-10 shrink-0 items-center justify-center rounded-[13px] border',
                           isActive
                             ? 'border-[color:var(--accent-outline)] bg-[color:var(--accent-soft)] text-[color:var(--text-main)]'
                             : 'border-[color:var(--border-soft)] bg-[color:var(--panel-subtle)] text-[color:var(--text-subtle)] group-hover:border-[color:var(--border-strong)] group-hover:text-[color:var(--text-main)]',
@@ -310,13 +358,13 @@ export function AppShell({
                       <span
                         className={clsx(
                           'min-w-0 transition-opacity',
-                          preferences.sidebarCollapsed && 'lg:hidden',
+                          preferences.sidebarCollapsed && 'xl:hidden',
                         )}
                       >
                         <span className="block truncate text-sm font-medium">
                           {item.label}
                         </span>
-                        <span className="mt-0.5 block truncate text-[11px] uppercase tracking-[0.18em] text-[color:var(--text-muted)]">
+                        <span className="mt-1 block truncate text-[11px] uppercase tracking-[0.18em] text-[color:var(--text-muted)]">
                           {item.eyebrow}
                         </span>
                       </span>
@@ -327,76 +375,63 @@ export function AppShell({
             </ul>
           </nav>
 
-          <div className="mt-5 border-t border-[color:var(--border-soft)] px-2 pb-1 pt-4">
-            <div
-              className={clsx(
-                'surface-muted p-4',
-                preferences.sidebarCollapsed && 'lg:px-2 lg:py-3',
-              )}
-            >
-              <div className="flex items-center gap-3">
+          <div className="mt-5 border-t border-[color:var(--border-soft)] px-1 pt-4">
+            <div className="grid gap-2">
+              <Link
+                className="toolbar-button min-w-0"
+                href="/settings"
+              >
+                <span className="eyebrow-label">Operator tools</span>
                 <span
                   className={clsx(
-                    'status-dot',
-                    connectionTone === 'healthy' &&
-                      'bg-[color:var(--success-strong)]',
-                    connectionTone === 'offline' &&
-                      'bg-[color:var(--danger-strong)]',
-                    connectionTone === 'pending' &&
-                      'bg-[color:var(--warning-strong)]',
+                    'mt-2 block text-sm font-medium text-[color:var(--text-main)]',
+                    preferences.sidebarCollapsed && 'xl:hidden',
                   )}
-                />
-                <div
-                  className={clsx(preferences.sidebarCollapsed && 'lg:hidden')}
                 >
-                  <p className="text-sm font-medium">Signed in as {userName}</p>
-                  <p className="mt-1 text-xs leading-5 text-[color:var(--text-subtle)]">
-                    {statusLabel(health, websocketStatus)}
-                  </p>
-                </div>
-              </div>
+                  Settings
+                </span>
+                <span
+                  className={clsx(
+                    'mt-2 block text-sm font-medium text-[color:var(--text-main)] xl:hidden',
+                    !preferences.sidebarCollapsed && 'hidden',
+                  )}
+                >
+                  Gear
+                </span>
+              </Link>
+
+              <button
+                className="toolbar-button min-w-0"
+                onClick={onSignOut}
+                type="button"
+              >
+                <span className="eyebrow-label">Session</span>
+                <span
+                  className={clsx(
+                    'mt-2 block text-sm font-medium text-[color:var(--text-main)]',
+                    preferences.sidebarCollapsed && 'xl:hidden',
+                  )}
+                >
+                  Sign out
+                </span>
+                <span
+                  className={clsx(
+                    'mt-2 block text-sm font-medium text-[color:var(--text-main)] xl:hidden',
+                    !preferences.sidebarCollapsed && 'hidden',
+                  )}
+                >
+                  Exit
+                </span>
+              </button>
             </div>
-
-            <button
-              className="mt-3 flex h-11 w-full items-center justify-center rounded-[12px] border border-[color:var(--border-soft)] bg-[color:var(--panel-subtle)] text-sm font-medium text-[color:var(--text-subtle)] transition hover:border-[color:var(--border-strong)] hover:bg-[color:var(--panel-muted)] hover:text-[color:var(--text-main)]"
-              onClick={onSignOut}
-              type="button"
-            >
-              <span
-                className={clsx(preferences.sidebarCollapsed && 'lg:hidden')}
-              >
-                Sign out
-              </span>
-              <span
-                className={clsx(!preferences.sidebarCollapsed && 'lg:hidden')}
-              >
-                ↩
-              </span>
-            </button>
-
-            <Link
-              className="mt-2 flex h-11 w-full items-center justify-center rounded-[12px] border border-[color:var(--border-soft)] bg-[color:var(--panel-subtle)] text-sm font-medium text-[color:var(--text-subtle)] transition hover:border-[color:var(--border-strong)] hover:bg-[color:var(--panel-muted)] hover:text-[color:var(--text-main)]"
-              href="/settings"
-            >
-              <span
-                className={clsx(preferences.sidebarCollapsed && 'lg:hidden')}
-              >
-                Settings
-              </span>
-              <span
-                className={clsx(!preferences.sidebarCollapsed && 'lg:hidden')}
-              >
-                ⚙
-              </span>
-            </Link>
           </div>
         </aside>
 
-        <section className="surface-panel flex min-h-[calc(100vh-2rem)] flex-col px-5 py-5 sm:px-6">
-          <header className="border-b border-[color:var(--border-soft)] pb-5">
-            <div className="flex flex-col gap-5 xl:flex-row xl:items-start xl:justify-between">
+        <section className="surface-panel flex min-h-[calc(100vh-1.5rem)] flex-col px-4 py-4 sm:px-5 sm:py-5">
+          <header className="workspace-hero rounded-[28px] border border-[color:var(--border-soft)] px-5 py-5 sm:px-6 sm:py-6">
+            <div className="flex flex-col gap-6 2xl:flex-row 2xl:items-start 2xl:justify-between">
               <div className="max-w-3xl">
-                <div className="flex items-center gap-3">
+                <div className="flex flex-wrap items-center gap-2.5">
                   <span className="status-badge">
                     <ShellGlyph className="h-3.5 w-3.5" name="pulse" />
                     {meta.eyebrow}
@@ -416,54 +451,60 @@ export function AppShell({
                   </span>
                 </div>
 
-                <h2 className="mt-4 text-4xl font-semibold tracking-[-0.05em] sm:text-[3rem]">
-                  {meta.label}
-                </h2>
-                <p className="mt-3 max-w-2xl text-[15px] leading-7 text-[color:var(--text-subtle)]">
-                  {meta.description}
-                </p>
+                <div className="mt-5">
+                  <p className="eyebrow-label">Live operator workspace</p>
+                  <h2 className="mt-3 max-w-2xl text-[2.4rem] font-semibold tracking-[-0.06em] sm:text-[3.1rem]">
+                    {meta.label}
+                  </h2>
+                  <p className="mt-3 max-w-2xl text-[15px] leading-7 text-[color:var(--text-subtle)]">
+                    {meta.description}
+                  </p>
+                </div>
               </div>
 
-              <div className="grid gap-2 sm:grid-cols-3 xl:w-[430px]">
+              <div className="grid gap-2 sm:grid-cols-2 2xl:w-[420px]">
                 <button
-                  className="toolbar-button"
+                  className="workspace-tile text-left transition hover:border-[color:var(--border-strong)]"
                   onClick={onNotificationToggle}
                   type="button"
                 >
-                  <span className="flex items-center gap-2 text-[color:var(--text-subtle)]">
+                  <div className="flex items-center gap-2 text-[color:var(--text-subtle)]">
                     <ShellGlyph className="h-4 w-4" name="notifications" />
                     <span className="eyebrow-label">Notifications</span>
-                  </span>
-                  <span className="mt-2 block text-sm font-medium text-[color:var(--text-main)]">
+                  </div>
+                  <p className="mt-3 text-lg font-semibold tracking-[-0.03em]">
                     {unreadCount} unread item{unreadCount === 1 ? '' : 's'}
-                  </span>
+                  </p>
                 </button>
 
-                <div className="toolbar-control min-w-0">
-                  <span className="flex items-center gap-2 text-[color:var(--text-subtle)]">
-                    <ShellGlyph className="h-4 w-4" name="connectivity" />
-                    <span className="eyebrow-label">Last event</span>
-                  </span>
-                  <span className="mt-2 block text-sm font-medium text-[color:var(--text-main)]">
+                <div className="workspace-tile">
+                  <p className="eyebrow-label">Last event</p>
+                  <p className="mt-3 text-lg font-semibold tracking-[-0.03em]">
                     {lastEventLabel(lastEventAt, use24HourTime)}
-                  </span>
+                  </p>
                 </div>
 
-                <div className="toolbar-control min-w-0">
-                  <span className="eyebrow-label">Session</span>
-                  <span className="mt-2 block text-sm font-medium text-[color:var(--text-main)]">
+                <div className="workspace-tile">
+                  <p className="eyebrow-label">Session</p>
+                  <p className="mt-3 text-lg font-semibold tracking-[-0.03em]">
                     {isSaving ? 'Saving changes...' : 'Saved'}
-                  </span>
+                  </p>
+                </div>
+
+                <div className="workspace-tile">
+                  <p className="eyebrow-label">Layout profile</p>
+                  <p className="mt-3 text-lg font-semibold tracking-[-0.03em]">
+                    {dashboard.layout.preset === 'compact' ? 'Compact' : 'Balanced'}
+                  </p>
                 </div>
               </div>
             </div>
 
-            <div className="mt-5 flex flex-col gap-3 xl:flex-row xl:items-center xl:justify-between">
+            <div className="mt-6 flex flex-col gap-3 border-t border-[color:var(--border-soft)] pt-5">
               <div>
-                <p className="eyebrow-label">Workspace Controls</p>
+                <p className="eyebrow-label">Workspace controls</p>
                 <p className="mt-1 text-sm text-[color:var(--text-subtle)]">
-                  Keep the shell focused while layout and display settings stay
-                  one click away.
+                  Theme, density, and layout stay close to the top of the page without taking over the first scan.
                 </p>
               </div>
 
@@ -504,7 +545,7 @@ export function AppShell({
                   value={dashboard.layout.preset}
                 />
                 <button
-                  className="toolbar-button min-w-[150px]"
+                  className="toolbar-button min-w-[148px]"
                   onClick={onCompactToggle}
                   type="button"
                 >
@@ -520,16 +561,15 @@ export function AppShell({
             </div>
           </header>
 
-          <div className="mt-6 flex items-center justify-between gap-4">
+          <div className="mt-5 flex flex-col gap-3 border-b border-[color:var(--border-soft)] pb-4 sm:flex-row sm:items-end sm:justify-between">
             <div>
-              <p className="eyebrow-label">Current Surface</p>
-              <h3 className="mt-2 text-xl font-semibold tracking-[-0.03em]">
-                Dashboard
+              <p className="eyebrow-label">Current surface</p>
+              <h3 className="mt-2 text-[1.35rem] font-semibold tracking-[-0.04em]">
+                Dashboard field
               </h3>
             </div>
-            <p className="text-sm text-[color:var(--text-subtle)]">
-              {dashboard.layout.preset === 'compact' ? 'Compact' : 'Balanced'}{' '}
-              layout
+            <p className="text-sm leading-6 text-[color:var(--text-subtle)]">
+              The grid below prioritizes current state first, then the supporting detail needed to act.
             </p>
           </div>
 

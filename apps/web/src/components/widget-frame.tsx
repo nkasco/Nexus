@@ -3,9 +3,7 @@
 import clsx from 'clsx';
 import Link from 'next/link';
 import { useState, type ReactNode } from 'react';
-import type {
-  WidgetFocusMode,
-} from '@nexus/shared';
+import type { WidgetFocusMode } from '@nexus/shared';
 import type {
   WidgetListItem,
   WidgetStat,
@@ -72,15 +70,15 @@ function toneClass(tone: WidgetTone = 'default') {
 
 function toneSurfaceClass(tone: WidgetTone = 'default') {
   if (tone === 'danger') {
-    return 'border-[color:color-mix(in_srgb,var(--danger-strong)_28%,transparent)] bg-[color:color-mix(in_srgb,var(--danger-strong)_10%,var(--panel-subtle))]';
+    return 'border-[color:color-mix(in_srgb,var(--danger-strong)_28%,transparent)] bg-[color:color-mix(in_srgb,var(--danger-strong)_8%,var(--panel-subtle))]';
   }
 
   if (tone === 'warning') {
-    return 'border-[color:color-mix(in_srgb,var(--warning-strong)_28%,transparent)] bg-[color:color-mix(in_srgb,var(--warning-strong)_10%,var(--panel-subtle))]';
+    return 'border-[color:color-mix(in_srgb,var(--warning-strong)_28%,transparent)] bg-[color:color-mix(in_srgb,var(--warning-strong)_8%,var(--panel-subtle))]';
   }
 
   if (tone === 'success') {
-    return 'border-[color:color-mix(in_srgb,var(--success-strong)_28%,transparent)] bg-[color:color-mix(in_srgb,var(--success-strong)_9%,var(--panel-subtle))]';
+    return 'border-[color:color-mix(in_srgb,var(--success-strong)_28%,transparent)] bg-[color:color-mix(in_srgb,var(--success-strong)_8%,var(--panel-subtle))]';
   }
 
   return 'border-[color:var(--border-soft)] bg-[color:var(--panel-subtle)]';
@@ -110,100 +108,106 @@ export function WidgetFrame({
   return (
     <article
       className={clsx(
-        'surface-card flex min-h-[280px] flex-col p-5 sm:p-6',
+        'widget-shell surface-card flex min-h-[300px] flex-col p-5 sm:p-6',
         className,
       )}
       data-state={state}
     >
-      <div className="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
-        <div className="min-w-0">
-          <p className="eyebrow-label">{eyebrow}</p>
-          <h3 className="mt-3 text-[1.9rem] font-semibold tracking-[-0.05em] text-[color:var(--text-main)]">
-            {title}
-          </h3>
-        </div>
+      <div className="flex flex-col gap-5 border-b border-[color:var(--border-soft)] pb-5">
+        <div className="flex flex-col gap-4 xl:flex-row xl:items-start xl:justify-between">
+          <div className="min-w-0">
+            <p className="eyebrow-label">{eyebrow}</p>
+            <h3 className="mt-3 text-[1.85rem] font-semibold tracking-[-0.05em] text-[color:var(--text-main)]">
+              {title}
+            </h3>
+          </div>
 
-        <div className="flex flex-col items-start gap-3 lg:items-end">
-          {metric ? (
-            <div
-              className={clsx(
-                'rounded-full border px-3 py-1 text-xs font-medium uppercase tracking-[0.14em]',
-                toneSurfaceClass(state === 'ready' ? tone : 'default'),
-                state === 'ready' ? toneClass(tone) : toneClass('default'),
-              )}
-            >
-              {metric}
-            </div>
-          ) : null}
-
-          <div className="flex flex-wrap gap-2">
-            {onRefresh ? (
-              <button
-                className="widget-action-button"
-                disabled={isRefreshing}
-                onClick={onRefresh}
-                type="button"
+          <div className="flex flex-col items-start gap-3 xl:items-end">
+            {metric ? (
+              <div
+                className={clsx(
+                  'rounded-full border px-3 py-1 text-xs font-medium uppercase tracking-[0.15em]',
+                  toneSurfaceClass(state === 'ready' ? tone : 'default'),
+                  state === 'ready' ? toneClass(tone) : toneClass('default'),
+                )}
               >
-                {isRefreshing ? 'Refreshing...' : 'Refresh'}
-              </button>
-            ) : null}
-
-            {onFocusChange ? (
-              <div className="relative">
-                <button
-                  aria-expanded={isConfigOpen}
-                  className="widget-action-button"
-                  onClick={() => setIsConfigOpen((current) => !current)}
-                  type="button"
-                >
-                  Configure
-                </button>
-
-                {isConfigOpen ? (
-                  <div className="widget-config-panel">
-                    <p className="eyebrow-label">Display Focus</p>
-                    <div className="mt-3 grid gap-2">
-                      {(['summary', 'attention'] as const).map((option) => (
-                        <button
-                          className={clsx(
-                            'widget-config-option',
-                            focus === option && 'widget-config-option-active',
-                          )}
-                          key={option}
-                          onClick={() => {
-                            onFocusChange(option);
-                            setIsConfigOpen(false);
-                          }}
-                          type="button"
-                        >
-                          <span className="block text-sm font-medium capitalize text-[color:var(--text-main)]">
-                            {option}
-                          </span>
-                          <span className="mt-1 block text-xs leading-5 text-[color:var(--text-subtle)]">
-                            {option === 'summary'
-                              ? 'Balanced snapshot across the current surface.'
-                              : 'Prioritize warnings and degraded items first.'}
-                          </span>
-                        </button>
-                      ))}
-                    </div>
-                  </div>
-                ) : null}
+                {metric}
               </div>
             ) : null}
 
-            {navigationHref ? (
-              <Link className="widget-action-button" href={navigationHref}>
-                Open
-              </Link>
-            ) : null}
+            <div className="flex flex-wrap gap-2">
+              {onRefresh ? (
+                <button
+                  className="widget-action-button"
+                  disabled={isRefreshing}
+                  onClick={onRefresh}
+                  type="button"
+                >
+                  {isRefreshing ? 'Refreshing...' : 'Refresh'}
+                </button>
+              ) : null}
+
+              {onFocusChange ? (
+                <div className="relative">
+                  <button
+                    aria-expanded={isConfigOpen}
+                    className="widget-action-button"
+                    onClick={() => setIsConfigOpen((current) => !current)}
+                    type="button"
+                  >
+                    Configure
+                  </button>
+
+                  {isConfigOpen ? (
+                    <div className="widget-config-panel">
+                      <p className="eyebrow-label">Display focus</p>
+                      <div className="mt-3 grid gap-2">
+                        {(['summary', 'attention'] as const).map((option) => (
+                          <button
+                            className={clsx(
+                              'widget-config-option',
+                              focus === option && 'widget-config-option-active',
+                            )}
+                            key={option}
+                            onClick={() => {
+                              onFocusChange(option);
+                              setIsConfigOpen(false);
+                            }}
+                            type="button"
+                          >
+                            <span className="block text-sm font-medium capitalize text-[color:var(--text-main)]">
+                              {option}
+                            </span>
+                            <span className="mt-1 block text-xs leading-5 text-[color:var(--text-subtle)]">
+                              {option === 'summary'
+                                ? 'Balanced snapshot across the current surface.'
+                                : 'Prioritize warnings and degraded items first.'}
+                            </span>
+                          </button>
+                        ))}
+                      </div>
+                    </div>
+                  ) : null}
+                </div>
+              ) : null}
+
+              {navigationHref ? (
+                <Link className="widget-action-button" href={navigationHref}>
+                  Open
+                </Link>
+              ) : null}
+            </div>
           </div>
         </div>
+
+        <p className="max-w-3xl text-sm leading-6 text-[color:var(--text-subtle)]">
+          {detail}
+        </p>
       </div>
 
-      <div className="mt-5 flex flex-1 flex-col justify-between border-t border-[color:var(--border-soft)] pt-5">
+      <div className="mt-5 flex flex-1 flex-col justify-between">
         {fallback ? (
-          <div className="rounded-[16px] border border-[color:var(--border-soft)] bg-[color:var(--panel-subtle)] px-4 py-4">
+          <div className="widget-stat-block">
             <p className={clsx('text-sm font-medium', fallback.toneClass)}>
               {fallback.label}
             </p>
@@ -214,19 +218,16 @@ export function WidgetFrame({
         ) : (
           <div className="space-y-4">
             {stats && stats.length > 0 ? (
-              <div className="grid gap-3 sm:grid-cols-3">
+              <div className="grid gap-3 lg:grid-cols-3">
                 {stats.map((entry) => (
                   <div
-                    className={clsx(
-                      'rounded-[16px] border px-4 py-4',
-                      toneSurfaceClass(entry.tone),
-                    )}
+                    className={clsx('widget-stat-block', toneSurfaceClass(entry.tone))}
                     key={`${entry.label}-${entry.value}`}
                   >
                     <p className="eyebrow-label">{entry.label}</p>
                     <p
                       className={clsx(
-                        'mt-3 text-lg font-semibold tracking-[-0.03em]',
+                        'mt-3 text-xl font-semibold tracking-[-0.04em]',
                         toneClass(entry.tone),
                       )}
                     >
@@ -243,20 +244,17 @@ export function WidgetFrame({
             ) : null}
 
             {items && items.length > 0 ? (
-              <div className="space-y-2">
+              <div className="space-y-2.5">
                 {items.map((entry) => (
                   <div
-                    className={clsx(
-                      'rounded-[16px] border px-4 py-3',
-                      toneSurfaceClass(entry.tone),
-                    )}
+                    className={clsx('widget-list-row', toneSurfaceClass(entry.tone))}
                     key={`${entry.label}-${entry.value ?? entry.detail}`}
                   >
                     <div className="flex flex-wrap items-start justify-between gap-3">
                       <div className="min-w-0 flex-1">
                         <p
                           className={clsx(
-                            'text-sm font-medium',
+                            'text-sm font-medium leading-6',
                             toneClass(entry.tone),
                           )}
                         >
@@ -279,8 +277,8 @@ export function WidgetFrame({
           </div>
         )}
 
-        <div className="mt-6 flex flex-col gap-2 border-t border-[color:var(--border-soft)] pt-4 text-sm leading-7 text-[color:var(--text-subtle)] sm:flex-row sm:items-start sm:justify-between sm:gap-4">
-          <p className="max-w-2xl">{detail}</p>
+        <div className="mt-6 flex flex-col gap-2 border-t border-[color:var(--border-soft)] pt-4 text-sm leading-7 text-[color:var(--text-subtle)] sm:flex-row sm:items-center sm:justify-between sm:gap-4">
+          <p className="eyebrow-label">Current snapshot</p>
           {updatedLabel ? (
             <p className="whitespace-nowrap text-xs uppercase tracking-[0.16em] text-[color:var(--text-muted)]">
               Updated {updatedLabel}

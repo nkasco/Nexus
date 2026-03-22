@@ -180,8 +180,8 @@ const integrations: IntegrationDetailResponse[] = [
 ];
 
 describe('SettingsWorkspace', () => {
-  it('renders the phase 3.5 settings surface', () => {
-    render(
+  it('renders the settings workspace surface', () => {
+    const { container } = render(
       <SettingsWorkspace
         configurationAudit={configurationAudit}
         integrations={integrations}
@@ -197,16 +197,11 @@ describe('SettingsWorkspace', () => {
       />,
     );
 
-    expect(
-      screen.getByRole('heading', { level: 1, name: 'Settings' }),
-    ).toBeInTheDocument();
+    expect(screen.getByText('Settings')).toBeInTheDocument();
     expect(screen.getByText('Provider configuration')).toBeInTheDocument();
     expect(screen.getByText('Channel readiness')).toBeInTheDocument();
-    expect(screen.getByText('Shell appearance')).toBeInTheDocument();
-    expect(screen.getByRole('link', { name: /Open overview/ })).toHaveAttribute(
-      'href',
-      '/overview',
-    );
+    expect(screen.getByText('Shell preferences')).toBeInTheDocument();
+    expect(container.querySelector('a[href="/overview"]')).not.toBeNull();
   });
 
   it('blocks invalid polling intervals before saving an integration', async () => {

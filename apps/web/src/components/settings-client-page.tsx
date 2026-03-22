@@ -159,7 +159,7 @@ export function SettingsClientPage() {
   if (isBootstrapping || !settingsOverview) {
     return (
       <main className="flex min-h-screen items-center justify-center px-6 text-[color:var(--text-main)]">
-        <div className="surface-panel px-6 py-5 text-sm text-[color:var(--text-subtle)]">
+        <div className="canvas-message px-6 py-5 text-sm">
           Restoring the settings workspace...
         </div>
       </main>
