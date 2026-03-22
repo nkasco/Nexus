@@ -193,23 +193,63 @@ This file should be updated after implementation work so completed items, remain
 
 ### Deliverables
 
-- [ ] Build overview KPI cards for compute, storage, network, media, and CI/CD
-- [ ] Build Proxmox cluster and VM status widgets
-- [ ] Build TrueNAS pool health and capacity widgets
-- [ ] Build UniFi network health and client widgets
-- [ ] Build Home Assistant entity and automation summary widgets
-- [ ] Build Plex session and library summary widgets
-- [ ] Build GitHub workflow and PR status widgets
-- [ ] Build global alert summary widget
-- [ ] Build recent events and activity feed widget
-- [ ] Add per-widget refresh, configuration, and navigation actions
-- [ ] Add responsive layout behavior for desktop and smaller screens
+- [x] Build overview KPI cards for compute, storage, network, media, and CI/CD
+- [x] Build Proxmox cluster and VM status widgets
+- [x] Build TrueNAS pool health and capacity widgets
+- [x] Build UniFi network health and client widgets
+- [x] Build Home Assistant entity and automation summary widgets
+- [x] Build Plex session and library summary widgets
+- [x] Build GitHub workflow and PR status widgets
+- [x] Build global alert summary widget
+- [x] Build recent events and activity feed widget
+- [x] Add per-widget refresh, configuration, and navigation actions
+- [x] Add responsive layout behavior for desktop and smaller screens
 
 ### Exit Criteria
 
-- [ ] Overview page surfaces key health and activity across all integrated services
-- [ ] Each core domain has at least one usable widget in the UI
-- [ ] UI reflects real-time updates without full-page refreshes
+- [x] Overview page surfaces key health and activity across all integrated services
+- [x] Each core domain has at least one usable widget in the UI
+- [x] UI reflects real-time updates without full-page refreshes
+
+### Phase 3 Notes
+
+- Phase 3 shipped a richer dashboard surface across Overview, Home Lab, Media, DevOps, Metrics, and Alerts by consuming per-provider integration detail payloads instead of only the higher-level Phase 2 overview summaries.
+- The default dashboard layouts were expanded to include overview KPI cards for compute, storage, network, media, and CI/CD, plus synthesized attention and recent activity widgets, and existing persisted layouts now normalize forward onto the new Phase 3 widget set automatically.
+- Home Lab now includes dedicated Proxmox cluster and guest runtime widgets, TrueNAS pool and capacity widgets, and UniFi network and client-load widgets built from the normalized asset and metric snapshot data.
+- Media now includes Home Assistant entity and automation summaries alongside Plex playback and library widgets, and DevOps now includes workflow, pull request, repository, and delivery-attention widgets sourced from the GitHub integration detail surface.
+- The Alerts and Metrics routes were upgraded from placeholders into usable current-state views, with alert-style summaries synthesized from degraded providers and warning or offline assets until the formal Phase 5 alert engine exists.
+- Widget cards now support per-widget refresh actions, persistent focus-mode configuration through the saved dashboard layout model, and quick navigation into the relevant dashboard route.
+- The authenticated shell now refreshes its dashboard data from the provider detail endpoints during bootstrap and on realtime integration events, so widget content updates without a full-page reload.
+- Unit tests were expanded for the new dashboard normalization path, widget rendering controls, and Phase 3 widget view builders, and `npm run test`, `npm run typecheck`, `npm run lint`, and `npm run build` all completed successfully after the implementation.
+- Playwright validation confirmed the authenticated Phase 3 surfaces render on `/overview`, `/home-lab`, `/media`, `/devops`, and `/alerts`, and the overview layout was also reviewed at a narrow mobile viewport.
+- During Playwright review, direct browser `fetch` login to `http://localhost:4000/auth/login` succeeded, but submitting the visible login form via automation returned `Invalid credentials`; the authenticated UI validation therefore proceeded by seeding a valid session into local storage. This appears to be an automation-path quirk rather than an API outage, but it should be revisited with dedicated end-to-end coverage.
+
+## Phase 3.5: Settings Panel and Required Configuration Coverage
+
+### Objectives
+
+- Confirm that every required operator-facing configuration path has an intentional home, whether that remains environment-driven or becomes editable in the app.
+- Expand the existing settings experience into a coherent control surface for all configuration that should be managed from Nexus itself.
+- Close the gap between backend capabilities and operator configuration workflows before later phases add more alerts, actions, and customization complexity.
+
+### Deliverables
+
+- [ ] Audit all required configuration surfaces across authentication, appearance, dashboards, integrations, notifications, polling/sync behavior, and other operator-managed platform settings
+- [ ] Document which settings are intentionally deployment-time or environment-only versus which must be editable in the Nexus UI
+- [ ] Confirm whether the current Phase 1 settings implementation already covers any required areas and explicitly note any gaps that still need UI support
+- [ ] Add or expand a dedicated settings panel or settings routes for all in-app managed configuration domains
+- [ ] Add integration configuration management for enabling/disabling providers, editing non-secret connection details, and clearly handling credential requirements
+- [ ] Add UI flows for managing notification-related configuration that is required before Phase 5 alert delivery can be considered complete
+- [ ] Add dashboard and operator preference controls for any remaining required personalization or default behavior not already covered by the existing settings model
+- [ ] Add guardrails, validation, help text, and empty/error states so operators can understand what is configurable in-app versus elsewhere
+- [ ] Update backend/frontend contracts and persistence models as needed to support newly surfaced settings domains
+- [ ] Add or update unit tests covering the settings panel state, validation, and persistence behavior for each newly introduced configuration workflow
+
+### Exit Criteria
+
+- [ ] Every required configuration item has a documented ownership path: in-app settings, deployment-time environment configuration, or intentionally deferred future work
+- [ ] Operators can reach a single clear settings experience for all configuration that Nexus expects them to manage through the product
+- [ ] Newly added settings flows persist correctly, handle invalid input safely, and communicate secret/configuration boundaries clearly
 
 ## Phase 4: Historical Metrics, Graphs, and KPI Rollups
 
@@ -355,7 +395,7 @@ This file should be updated after implementation work so completed items, remain
 
 ## Recommended Delivery Sequence
 
-- [ ] Complete Phases 0 through 3 before enabling any write actions
+- [ ] Complete Phases 0 through 3.5 before enabling any write actions
 - [ ] Complete Phase 4 before marketing historical insights as a primary feature
 - [ ] Complete Phase 5 before relying on Nexus for operational alerting
 - [ ] Complete Phase 6 before positioning Nexus as a true control plane

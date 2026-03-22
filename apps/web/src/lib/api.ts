@@ -3,6 +3,8 @@ import type {
   DashboardResponse,
   DashboardSlug,
   HealthResponse,
+  IntegrationDetailResponse,
+  IntegrationProvider,
   IntegrationsOverviewResponse,
   LoginRequest,
   NotificationListResponse,
@@ -93,6 +95,18 @@ export const api = {
     }),
   getIntegrations: (token: string) =>
     request<IntegrationsOverviewResponse>('/integrations', { token }),
+  getIntegrationDetail: (token: string, provider: IntegrationProvider) =>
+    request<IntegrationDetailResponse>(`/integrations/${provider}`, { token }),
+  syncIntegrations: (token: string) =>
+    request<IntegrationsOverviewResponse>('/integrations/sync', {
+      method: 'POST',
+      token,
+    }),
+  syncIntegration: (token: string, provider: IntegrationProvider) =>
+    request<IntegrationDetailResponse>(`/integrations/${provider}/sync`, {
+      method: 'POST',
+      token,
+    }),
 };
 
 export function getWebSocketUrl(token: string) {

@@ -4,11 +4,14 @@ import type {
   DashboardResponse,
   DashboardSlug,
   HealthResponse,
+  IntegrationDetailResponse,
+  IntegrationProvider,
   IntegrationsOverviewResponse,
   NotificationItem,
   RealtimeEvent,
   UiPreferences,
 } from '@nexus/shared';
+import { integrationProviders } from '@nexus/shared';
 import { startTransition, useEffect, useState } from 'react';
 import { api, getWebSocketUrl } from '../lib/api';
 import {
@@ -23,6 +26,28 @@ import { LoginPanel } from './login-panel';
 
 interface NexusClientAppProps {
   section: DashboardSlug;
+}
+
+function toDetailMap(
+  details: IntegrationDetailResponse[],
+): Partial<Record<IntegrationProvider, IntegrationDetailResponse>> {
+  return Object.fromEntries(
+    details.map((detail) => [detail.integration.provider, detail] as const),
+  );
+}
+
+async function loadIntegrationData(activeToken: string) {
+  const [overview, ...details] = await Promise.all([
+    api.getIntegrations(activeToken),
+    ...integrationProviders.map((provider) =>
+      api.getIntegrationDetail(activeToken, provider),
+    ),
+  ]);
+
+  return {
+    overview,
+    details: toDetailMap(details),
+  };
 }
 
 export function NexusClientApp({ section }: NexusClientAppProps) {
@@ -46,9 +71,15 @@ export function NexusClientApp({ section }: NexusClientAppProps) {
   const [health, setHealth] = useState<HealthResponse | null>(null);
   const [integrationsOverview, setIntegrationsOverview] =
     useState<IntegrationsOverviewResponse | null>(null);
+  const [integrationDetails, setIntegrationDetails] = useState<
+    Partial<Record<IntegrationProvider, IntegrationDetailResponse>>
+  >({});
   const [errorMessage, setErrorMessage] = useState<string>();
   const [isBootstrapping, setIsBootstrapping] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
+  const [refreshingWidgetIds, setRefreshingWidgetIds] = useState<
+    Record<string, boolean>
+  >({});
   const [isNotificationCenterOpen, setIsNotificationCenterOpen] =
     useState(false);
   const [websocketStatus, setWebsocketStatus] = useState<
@@ -145,6 +176,8 @@ export function NexusClientApp({ section }: NexusClientAppProps) {
     if (!token) {
       setDashboard(null);
       setIntegrationsOverview(null);
+      setIntegrationDetails({});
+      setRefreshingWidgetIds({});
       return;
     }
 
@@ -158,13 +191,13 @@ export function NexusClientApp({ section }: NexusClientAppProps) {
           nextPreferences,
           nextDashboard,
           nextNotifications,
-          nextIntegrationsOverview,
+          integrationData,
         ] = await Promise.all([
           api.getSession(token),
           api.getPreferences(token),
           api.getDashboard(token, section),
           api.getNotifications(token),
-          api.getIntegrations(token),
+          loadIntegrationData(token),
         ]);
 
         startTransition(() => {
@@ -173,7 +206,8 @@ export function NexusClientApp({ section }: NexusClientAppProps) {
             nextNotifications.items,
             nextNotifications.unreadCount,
           );
-          setIntegrationsOverview(nextIntegrationsOverview);
+          setIntegrationsOverview(integrationData.overview);
+          setIntegrationDetails(integrationData.details);
           setSession({
             token,
             user: session.user,
@@ -211,9 +245,10 @@ export function NexusClientApp({ section }: NexusClientAppProps) {
     }
 
     const refreshIntegrations = async () => {
-      const nextIntegrationsOverview = await api.getIntegrations(token);
+      const integrationData = await loadIntegrationData(token);
       startTransition(() => {
-        setIntegrationsOverview(nextIntegrationsOverview);
+        setIntegrationsOverview(integrationData.overview);
+        setIntegrationDetails(integrationData.details);
       });
     };
 
@@ -342,7 +377,82 @@ export function NexusClientApp({ section }: NexusClientAppProps) {
       onSignOut={() => {
         clearSession();
         setDashboard(null);
+        setIntegrationDetails({});
         setLastEventAt(null);
+      }}
+      onWidgetFocusChange={(widgetId, focus) => {
+        const nextDashboard = {
+          ...dashboard,
+          layout: {
+            ...dashboard.layout,
+            widgets: dashboard.layout.widgets.map((widget) =>
+              widget.id === widgetId
+                ? {
+                    ...widget,
+                    settings: {
+                      ...widget.settings,
+                      focus,
+                    },
+                  }
+                : widget,
+            ),
+          },
+        };
+
+        setDashboard(nextDashboard);
+        void saveLayout(nextDashboard);
+      }}
+      onWidgetRefresh={async (widgetId) => {
+        if (!token) {
+          return;
+        }
+
+        const targetWidget = buildWidgetViews(
+          dashboard,
+          health,
+          integrationsOverview,
+          integrationDetails,
+        ).find((widget) => widget.id === widgetId);
+
+        if (!targetWidget?.refreshScope) {
+          return;
+        }
+
+        setRefreshingWidgetIds((current) => ({
+          ...current,
+          [widgetId]: true,
+        }));
+
+        try {
+          if (targetWidget.refreshScope === 'all') {
+            const nextOverview = await api.syncIntegrations(token);
+            const refreshed = await loadIntegrationData(token);
+
+            startTransition(() => {
+              setIntegrationsOverview(nextOverview);
+              setIntegrationDetails(refreshed.details);
+            });
+          } else {
+            const detail = await api.syncIntegration(
+              token,
+              targetWidget.refreshScope,
+            );
+            const nextOverview = await api.getIntegrations(token);
+
+            startTransition(() => {
+              setIntegrationsOverview(nextOverview);
+              setIntegrationDetails((current) => ({
+                ...current,
+                [detail.integration.provider]: detail,
+              }));
+            });
+          }
+        } finally {
+          setRefreshingWidgetIds((current) => ({
+            ...current,
+            [widgetId]: false,
+          }));
+        }
       }}
       onThemeChange={(theme) => {
         patchPreferences({ theme });
@@ -353,7 +463,13 @@ export function NexusClientApp({ section }: NexusClientAppProps) {
         unreadCount={unreadCount}
         userName={user.displayName}
         websocketStatus={websocketStatus}
-        widgets={buildWidgetViews(dashboard, health, integrationsOverview)}
+        refreshingWidgetIds={refreshingWidgetIds}
+        widgets={buildWidgetViews(
+          dashboard,
+          health,
+          integrationsOverview,
+          integrationDetails,
+        )}
       />
     );
   }

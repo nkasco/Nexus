@@ -58,6 +58,8 @@ describe('AppShell', () => {
         isSaving={false}
         lastEventAt="2026-03-21T12:00:00.000Z"
         notifications={notifications}
+        onWidgetFocusChange={() => {}}
+        onWidgetRefresh={() => {}}
         onAccentChange={() => {}}
         onCompactToggle={() => {}}
         onLayoutPresetChange={() => {}}
@@ -67,6 +69,7 @@ describe('AppShell', () => {
         onSignOut={() => {}}
         onThemeChange={() => {}}
         preferences={preferences}
+        refreshingWidgetIds={{}}
         section="overview"
         unreadCount={1}
         userName="Primary Operator"
@@ -74,12 +77,32 @@ describe('AppShell', () => {
         widgets={[
           {
             id: 'overview-health',
-            title: 'Fleet Health',
-            eyebrow: 'Fleet snapshot',
-            detail: 'Health summaries are sourced from the backend heartbeat.',
-            metric: 'Healthy',
+            title: 'Attention Summary',
+            eyebrow: 'Attention',
+            detail: 'Operational signals sourced from the current snapshot.',
+            metric: '1 signal',
             state: 'ready',
-            lines: ['Core platform online'],
+            focus: 'summary',
+            items: [
+              {
+                label: 'Proxmox sync',
+                value: '1 minute ago',
+                detail: 'Cluster quorum healthy across both nodes.',
+                tone: 'success',
+              },
+            ],
+            stats: [
+              {
+                label: 'Healthy',
+                value: '1',
+                detail: 'Providers currently healthy',
+                tone: 'success',
+              },
+            ],
+            tone: 'success',
+            updatedLabel: 'just now',
+            refreshScope: 'all',
+            navigationTarget: 'alerts',
             columnSpan: 2,
             rowSpan: 1,
           },
@@ -92,9 +115,14 @@ describe('AppShell', () => {
       screen.getByRole('heading', { level: 2, name: 'Overview' }),
     ).toBeInTheDocument();
     expect(screen.getByText('Workspace Controls')).toBeInTheDocument();
-    expect(screen.getByText('Fleet Health')).toBeInTheDocument();
+    expect(screen.getByText('Attention Summary')).toBeInTheDocument();
     expect(screen.getByText('1 unread item')).toBeInTheDocument();
-    expect(screen.getByText('Core platform online')).toBeInTheDocument();
+    expect(screen.getByText('Proxmox sync')).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: 'Refresh' })).toBeInTheDocument();
+    expect(screen.getByRole('link', { name: 'Open' })).toHaveAttribute(
+      'href',
+      '/alerts',
+    );
     expect(
       screen.getByRole('button', { name: 'Collapse sidebar' }),
     ).toBeInTheDocument();

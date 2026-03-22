@@ -30,6 +30,7 @@ interface AppShellProps {
   health: HealthResponse | null;
   lastEventAt: string | null;
   isSaving: boolean;
+  refreshingWidgetIds: Record<string, boolean>;
   onSidebarToggle: () => void;
   onThemeChange: (theme: UiPreferences['theme']) => void;
   onAccentChange: (accent: UiPreferences['accent']) => void;
@@ -37,6 +38,8 @@ interface AppShellProps {
   onLayoutPresetChange: (preset: DashboardResponse['layout']['preset']) => void;
   onNotificationToggle: () => void;
   onMarkAllRead: () => void;
+  onWidgetFocusChange: (widgetId: string, focus: WidgetView['focus']) => void;
+  onWidgetRefresh: (widgetId: string) => void;
   onSignOut: () => void;
 }
 
@@ -207,6 +210,7 @@ export function AppShell({
   health,
   lastEventAt,
   isSaving,
+  refreshingWidgetIds,
   onSidebarToggle,
   onThemeChange,
   onAccentChange,
@@ -214,6 +218,8 @@ export function AppShell({
   onLayoutPresetChange,
   onNotificationToggle,
   onMarkAllRead,
+  onWidgetFocusChange,
+  onWidgetRefresh,
   onSignOut,
 }: AppShellProps) {
   const meta = getSectionMeta(section);
@@ -514,23 +520,30 @@ export function AppShell({
                 className={widgetSpanClass(widget, preferences.compactMode)}
                 detail={widget.detail}
                 eyebrow={widget.eyebrow}
+                focus={widget.focus}
+                isRefreshing={Boolean(refreshingWidgetIds[widget.id])}
+                items={widget.items}
                 key={widget.id}
                 metric={widget.metric}
+                navigationHref={
+                  widget.navigationTarget
+                    ? `/${widget.navigationTarget}`
+                    : undefined
+                }
+                onFocusChange={(focus) => onWidgetFocusChange(widget.id, focus)}
+                onRefresh={
+                  widget.refreshScope
+                    ? () => {
+                        onWidgetRefresh(widget.id);
+                      }
+                    : undefined
+                }
                 state={widget.state}
+                stats={widget.stats}
                 title={widget.title}
-              >
-                {widget.lines?.map((line) => (
-                  <div
-                    className="flex items-start gap-3 rounded-[14px] border border-[color:var(--border-soft)] bg-[color:var(--panel-subtle)] px-3 py-2.5"
-                    key={line}
-                  >
-                    <span className="mt-1 h-1.5 w-1.5 rounded-full bg-[color:var(--accent-strong)]" />
-                    <p className="text-sm leading-6 text-[color:var(--text-main)]">
-                      {line}
-                    </p>
-                  </div>
-                ))}
-              </WidgetFrame>
+                tone={widget.tone}
+                updatedLabel={widget.updatedLabel}
+              />
             ))}
           </div>
         </section>

@@ -9,8 +9,10 @@ export type {
   DashboardResponse,
   DashboardSlug,
   DashboardWidgetLayout,
+  DashboardWidgetSettings,
   LayoutPreset,
   UpdateDashboardLayoutRequest,
+  WidgetFocusMode,
 } from './contracts/dashboards';
 export type {
   HealthComponent,

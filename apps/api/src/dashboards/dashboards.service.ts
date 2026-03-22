@@ -3,6 +3,7 @@ import type {
   DashboardLayout,
   DashboardResponse,
   DashboardSlug,
+  DashboardWidgetLayout,
 } from '@nexus/shared';
 import { PrismaService } from '../prisma/prisma.service';
 
@@ -20,21 +21,45 @@ const DEFAULT_LAYOUTS: Record<DashboardSlug, DashboardLayout> = {
     preset: 'balanced',
     widgets: [
       {
-        id: 'overview-health',
-        title: 'Fleet Health',
+        id: 'overview-compute',
+        title: 'Compute Status',
+        columnSpan: 1,
+        rowSpan: 1,
+      },
+      {
+        id: 'overview-storage',
+        title: 'Storage Status',
+        columnSpan: 1,
+        rowSpan: 1,
+      },
+      {
+        id: 'overview-network',
+        title: 'Network Status',
+        columnSpan: 1,
+        rowSpan: 1,
+      },
+      {
+        id: 'overview-media',
+        title: 'Media Status',
+        columnSpan: 1,
+        rowSpan: 1,
+      },
+      {
+        id: 'overview-cicd',
+        title: 'CI/CD Status',
+        columnSpan: 1,
+        rowSpan: 1,
+      },
+      {
+        id: 'overview-alerts',
+        title: 'Attention Summary',
         columnSpan: 2,
         rowSpan: 1,
       },
       {
         id: 'overview-feed',
-        title: 'Operator Feed',
-        columnSpan: 1,
-        rowSpan: 1,
-      },
-      {
-        id: 'overview-capacity',
-        title: 'Capacity Radar',
-        columnSpan: 1,
+        title: 'Recent Activity',
+        columnSpan: 2,
         rowSpan: 1,
       },
     ],
@@ -48,10 +73,33 @@ const DEFAULT_LAYOUTS: Record<DashboardSlug, DashboardLayout> = {
         columnSpan: 2,
         rowSpan: 1,
       },
-      { id: 'homelab-power', title: 'Power Window', columnSpan: 1, rowSpan: 1 },
+      {
+        id: 'homelab-guests',
+        title: 'Guest Runtime',
+        columnSpan: 2,
+        rowSpan: 1,
+      },
+      {
+        id: 'homelab-pools',
+        title: 'Pool Health',
+        columnSpan: 1,
+        rowSpan: 1,
+      },
+      {
+        id: 'homelab-capacity',
+        title: 'Capacity Window',
+        columnSpan: 1,
+        rowSpan: 1,
+      },
       {
         id: 'homelab-network',
         title: 'Network Edge',
+        columnSpan: 1,
+        rowSpan: 1,
+      },
+      {
+        id: 'homelab-clients',
+        title: 'Client Load',
         columnSpan: 1,
         rowSpan: 1,
       },
@@ -61,6 +109,18 @@ const DEFAULT_LAYOUTS: Record<DashboardSlug, DashboardLayout> = {
     preset: 'balanced',
     widgets: [
       {
+        id: 'media-home-entities',
+        title: 'Entity Watch',
+        columnSpan: 1,
+        rowSpan: 1,
+      },
+      {
+        id: 'media-home-automations',
+        title: 'Automation Summary',
+        columnSpan: 1,
+        rowSpan: 1,
+      },
+      {
         id: 'media-streams',
         title: 'Active Streams',
         columnSpan: 2,
@@ -68,14 +128,8 @@ const DEFAULT_LAYOUTS: Record<DashboardSlug, DashboardLayout> = {
       },
       {
         id: 'media-libraries',
-        title: 'Library Drift',
-        columnSpan: 1,
-        rowSpan: 1,
-      },
-      {
-        id: 'media-actions',
-        title: 'Automation Queue',
-        columnSpan: 1,
+        title: 'Library Summary',
+        columnSpan: 2,
         rowSpan: 1,
       },
     ],
@@ -89,10 +143,21 @@ const DEFAULT_LAYOUTS: Record<DashboardSlug, DashboardLayout> = {
         columnSpan: 2,
         rowSpan: 1,
       },
-      { id: 'devops-prs', title: 'Review Queue', columnSpan: 1, rowSpan: 1 },
       {
-        id: 'devops-releases',
-        title: 'Release Track',
+        id: 'devops-prs',
+        title: 'Review Queue',
+        columnSpan: 2,
+        rowSpan: 1,
+      },
+      {
+        id: 'devops-repositories',
+        title: 'Repository Posture',
+        columnSpan: 1,
+        rowSpan: 1,
+      },
+      {
+        id: 'devops-delivery',
+        title: 'Delivery Attention',
         columnSpan: 1,
         rowSpan: 1,
       },
@@ -101,11 +166,10 @@ const DEFAULT_LAYOUTS: Record<DashboardSlug, DashboardLayout> = {
   metrics: {
     preset: 'balanced',
     widgets: [
-      { id: 'metrics-window', title: 'Time Window', columnSpan: 1, rowSpan: 1 },
       {
-        id: 'metrics-trends',
-        title: 'Trend Surface',
-        columnSpan: 2,
+        id: 'metrics-window',
+        title: 'Live Snapshot',
+        columnSpan: 1,
         rowSpan: 1,
       },
       {
@@ -114,21 +178,38 @@ const DEFAULT_LAYOUTS: Record<DashboardSlug, DashboardLayout> = {
         columnSpan: 1,
         rowSpan: 1,
       },
+      {
+        id: 'metrics-warnings',
+        title: 'Warning Metrics',
+        columnSpan: 2,
+        rowSpan: 1,
+      },
+      {
+        id: 'metrics-polling',
+        title: 'Polling Cadence',
+        columnSpan: 2,
+        rowSpan: 1,
+      },
     ],
   },
   alerts: {
     preset: 'balanced',
     widgets: [
-      { id: 'alerts-open', title: 'Open Alerts', columnSpan: 2, rowSpan: 1 },
       {
-        id: 'alerts-routing',
-        title: 'Notification Routing',
+        id: 'alerts-summary',
+        title: 'Signal Summary',
+        columnSpan: 2,
+        rowSpan: 1,
+      },
+      {
+        id: 'alerts-queue',
+        title: 'Attention Queue',
         columnSpan: 1,
         rowSpan: 1,
       },
       {
         id: 'alerts-history',
-        title: 'Recent State Changes',
+        title: 'Recent Activity',
         columnSpan: 1,
         rowSpan: 1,
       },
@@ -214,7 +295,7 @@ export class DashboardsService {
     try {
       const parsed = JSON.parse(layout) as DashboardLayout;
       this.validateLayout(parsed);
-      return parsed;
+      return this.normalizeLayout(slug, parsed);
     } catch {
       return DEFAULT_LAYOUTS[slug];
     }
@@ -235,10 +316,51 @@ export class DashboardsService {
           !widget.id ||
           !widget.title ||
           widget.columnSpan < 1 ||
-          widget.rowSpan < 1,
+          widget.rowSpan < 1 ||
+          !this.isValidWidgetSettings(widget.settings),
       )
     ) {
       throw new BadRequestException('Invalid dashboard widget definition');
     }
+  }
+
+  private normalizeLayout(
+    slug: DashboardSlug,
+    layout: DashboardLayout,
+  ): DashboardLayout {
+    const widgetById = new Map(
+      layout.widgets.map((widget) => [widget.id, widget] as const),
+    );
+
+    return {
+      preset: layout.preset,
+      widgets: DEFAULT_LAYOUTS[slug].widgets.map((defaultWidget) =>
+        this.mergeWidget(defaultWidget, widgetById.get(defaultWidget.id)),
+      ),
+    };
+  }
+
+  private mergeWidget(
+    defaultWidget: DashboardWidgetLayout,
+    storedWidget: DashboardWidgetLayout | undefined,
+  ): DashboardWidgetLayout {
+    if (!storedWidget) {
+      return defaultWidget;
+    }
+
+    return {
+      ...defaultWidget,
+      columnSpan: storedWidget.columnSpan,
+      rowSpan: storedWidget.rowSpan,
+      settings: storedWidget.settings,
+    };
+  }
+
+  private isValidWidgetSettings(settings: DashboardWidgetLayout['settings']) {
+    if (!settings) {
+      return true;
+    }
+
+    return settings.focus === undefined || settings.focus === 'summary' || settings.focus === 'attention';
   }
 }

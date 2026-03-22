@@ -1,12 +1,13 @@
 import type {
   DashboardResponse,
   HealthResponse,
+  IntegrationDetailResponse,
   IntegrationsOverviewResponse,
 } from '@nexus/shared';
 import { buildWidgetViews } from './dashboard-sections';
 
 describe('buildWidgetViews', () => {
-  it('hydrates overview widgets from the integration summary', () => {
+  it('builds phase 3 overview widgets from integration details', () => {
     const dashboard: DashboardResponse = {
       slug: 'overview',
       name: 'Overview',
@@ -15,20 +16,30 @@ describe('buildWidgetViews', () => {
         preset: 'balanced',
         widgets: [
           {
-            id: 'overview-health',
-            title: 'Fleet Health',
-            columnSpan: 2,
+            id: 'overview-compute',
+            title: 'Compute Status',
+            columnSpan: 1,
             rowSpan: 1,
           },
           {
+            id: 'overview-alerts',
+            title: 'Attention Summary',
+            columnSpan: 2,
+            rowSpan: 1,
+            settings: {
+              focus: 'attention',
+            },
+          },
+          {
             id: 'overview-feed',
-            title: 'Operator Feed',
-            columnSpan: 1,
+            title: 'Recent Activity',
+            columnSpan: 2,
             rowSpan: 1,
           },
         ],
       },
     };
+
     const health: HealthResponse = {
       service: 'nexus-api',
       status: 'ok',
@@ -36,13 +47,14 @@ describe('buildWidgetViews', () => {
       uptimeSeconds: 120,
       components: [],
     };
+
     const integrations: IntegrationsOverviewResponse = {
       generatedAt: '2026-03-21T18:05:00.000Z',
       totals: {
         providers: 2,
         healthyProviders: 1,
         degradedProviders: 1,
-        assets: 9,
+        assets: 10,
         metrics: 7,
       },
       integrations: [
@@ -93,7 +105,7 @@ describe('buildWidgetViews', () => {
             lastError: null,
             consecutiveFailures: 0,
             durationMs: 1100,
-            assetCount: 4,
+            assetCount: 5,
             metricCount: 3,
           },
           assetsByType: [
@@ -110,16 +122,165 @@ describe('buildWidgetViews', () => {
       ],
     };
 
-    const widgets = buildWidgetViews(dashboard, health, integrations);
+    const proxmoxDetail: IntegrationDetailResponse = {
+      integration: integrations.integrations[0]!,
+      credentials: [],
+      actions: [],
+      assets: [
+        {
+          id: 'cluster-1',
+          provider: 'proxmox',
+          assetType: 'cluster',
+          externalId: 'pve-cluster',
+          name: 'Homelab Cluster',
+          status: 'online',
+          summary: 'Quorum stable and replication online.',
+          metadata: { nodes: 2, guests: 4 },
+          lastSeenAt: '2026-03-21T18:05:00.000Z',
+        },
+        {
+          id: 'node-1',
+          provider: 'proxmox',
+          assetType: 'node',
+          externalId: 'pve-01',
+          name: 'pve-01',
+          status: 'online',
+          summary: 'CPU 38%, memory 62%, local storage 58% used.',
+          metadata: { cpuPercent: 38, memoryPercent: 62, storagePercent: 58 },
+          lastSeenAt: '2026-03-21T18:05:00.000Z',
+        },
+        {
+          id: 'node-2',
+          provider: 'proxmox',
+          assetType: 'node',
+          externalId: 'pve-02',
+          name: 'pve-02',
+          status: 'online',
+          summary: 'CPU 24%, memory 48%, replication standby ready.',
+          metadata: { cpuPercent: 24, memoryPercent: 48, storagePercent: 44 },
+          lastSeenAt: '2026-03-21T18:05:00.000Z',
+        },
+        {
+          id: 'vm-1',
+          provider: 'proxmox',
+          assetType: 'vm',
+          externalId: 'vm-120',
+          name: 'plex-core',
+          status: 'online',
+          summary: 'Media VM online with guest agent responding.',
+          metadata: { node: 'pve-01', powerState: 'running' },
+          lastSeenAt: '2026-03-21T18:05:00.000Z',
+        },
+        {
+          id: 'lxc-1',
+          provider: 'proxmox',
+          assetType: 'lxc',
+          externalId: 'lxc-221',
+          name: 'automation-edge',
+          status: 'warning',
+          summary: 'Guest agent reconnecting after routine package updates.',
+          metadata: { node: 'pve-02', powerState: 'running' },
+          lastSeenAt: '2026-03-21T18:05:00.000Z',
+        },
+      ],
+      metrics: [
+        {
+          id: 'metric-1',
+          provider: 'proxmox',
+          assetId: null,
+          scopeKey: 'proxmox:cluster.quorum',
+          key: 'cluster.quorum',
+          label: 'Cluster Quorum',
+          unit: null,
+          valueText: 'Healthy',
+          valueNumber: null,
+          status: 'normal',
+          metadata: {},
+          observedAt: '2026-03-21T18:05:00.000Z',
+        },
+      ],
+    };
+
+    const plexDetail: IntegrationDetailResponse = {
+      integration: integrations.integrations[1]!,
+      credentials: [],
+      actions: [],
+      assets: [
+        {
+          id: 'server-1',
+          provider: 'plex',
+          assetType: 'server',
+          externalId: 'plex-main',
+          name: 'Plex Main',
+          status: 'warning',
+          summary: 'Server online with elevated transcode activity.',
+          metadata: { activeStreams: 2, transcodes: 1 },
+          lastSeenAt: '2026-03-21T18:04:30.000Z',
+        },
+        {
+          id: 'session-1',
+          provider: 'plex',
+          assetType: 'session',
+          externalId: 'session-1001',
+          name: 'Living Room Stream',
+          status: 'online',
+          summary: 'Direct play session active in the living room.',
+          metadata: { mode: 'direct-play' },
+          lastSeenAt: '2026-03-21T18:04:30.000Z',
+        },
+        {
+          id: 'session-2',
+          provider: 'plex',
+          assetType: 'session',
+          externalId: 'session-1002',
+          name: 'Tablet Stream',
+          status: 'warning',
+          summary: 'Remote stream is transcoding to a lower bitrate.',
+          metadata: { mode: 'transcode' },
+          lastSeenAt: '2026-03-21T18:04:30.000Z',
+        },
+      ],
+      metrics: [
+        {
+          id: 'metric-plex-1',
+          provider: 'plex',
+          assetId: null,
+          scopeKey: 'plex:streams.transcode',
+          key: 'streams.transcode',
+          label: 'Transcodes',
+          unit: null,
+          valueText: '1',
+          valueNumber: 1,
+          status: 'warning',
+          metadata: {},
+          observedAt: '2026-03-21T18:04:30.000Z',
+        },
+      ],
+    };
+
+    const widgets = buildWidgetViews(dashboard, health, integrations, {
+      proxmox: proxmoxDetail,
+      plex: plexDetail,
+    });
 
     expect(widgets[0]).toMatchObject({
-      metric: '1/2 healthy',
+      id: 'overview-compute',
+      metric: '2 nodes',
       state: 'ready',
+      refreshScope: 'proxmox',
+      navigationTarget: 'home-lab',
     });
-    expect(widgets[0]?.lines).toContain(
-      'Proxmox: 2 nodes, 4 guests, quorum intact.',
-    );
-    expect(widgets[1]?.state).toBe('ready');
-    expect(widgets[1]?.lines?.[0]).toContain('Proxmox synced');
+    expect(widgets[0]?.stats?.[0]?.value).toBe('2');
+    expect(widgets[1]).toMatchObject({
+      id: 'overview-alerts',
+      metric: '4 signals',
+      tone: 'warning',
+      focus: 'attention',
+      refreshScope: 'all',
+    });
+    expect(
+      widgets[1]?.items?.some((item) => item.label.includes('Plex')),
+    ).toBe(true);
+    expect(widgets[2]?.items?.[0]?.label).toBe('nexus-api heartbeat');
   });
 });

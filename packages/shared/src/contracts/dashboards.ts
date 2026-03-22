@@ -8,11 +8,18 @@ export type DashboardSlug =
 
 export type LayoutPreset = 'balanced' | 'compact';
 
+export type WidgetFocusMode = 'summary' | 'attention';
+
+export interface DashboardWidgetSettings {
+  focus?: WidgetFocusMode;
+}
+
 export interface DashboardWidgetLayout {
   id: string;
   title: string;
   columnSpan: number;
   rowSpan: number;
+  settings?: DashboardWidgetSettings;
 }
 
 export interface DashboardLayout {

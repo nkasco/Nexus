@@ -235,4 +235,52 @@ a:focus-visible {
     border-color: var(--accent-outline);
     background: var(--panel-muted);
   }
+
+  .widget-action-button {
+    @apply inline-flex h-9 items-center justify-center rounded-[12px] border px-3 text-xs font-medium uppercase tracking-[0.14em] transition;
+    background: var(--panel-subtle);
+    border-color: var(--border-soft);
+    color: var(--text-subtle);
+  }
+
+  .widget-action-button:hover {
+    border-color: var(--border-strong);
+    background: var(--panel-muted);
+    color: var(--text-main);
+  }
+
+  .widget-action-button:disabled {
+    cursor: not-allowed;
+    opacity: 0.65;
+  }
+
+  .widget-config-panel {
+    @apply absolute right-0 z-10 mt-2 w-[250px] rounded-[18px] border p-4;
+    background: var(--panel-strong);
+    border-color: var(--border-soft);
+    box-shadow: var(--shadow-panel);
+  }
+
+  .widget-config-option {
+    @apply w-full rounded-[14px] border px-3 py-3 text-left transition;
+    background: var(--panel-subtle);
+    border-color: var(--border-soft);
+  }
+
+  .widget-config-option:hover {
+    border-color: var(--border-strong);
+    background: var(--panel-muted);
+  }
+
+  .widget-config-option-active {
+    border-color: var(--accent-outline);
+    background: var(--accent-soft);
+  }
+
+  .widget-inline-value {
+    @apply inline-flex items-center rounded-full border px-2.5 py-1 text-[11px] font-medium uppercase tracking-[0.14em];
+    border-color: var(--border-soft);
+    background: var(--panel-muted);
+    color: var(--text-main);
+  }
 }
