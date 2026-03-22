@@ -20,6 +20,7 @@ model Integration {
   provider       String                     @unique
   displayName    String
   enabled        Boolean                    @default(true)
+  pollingIntervalSeconds Int?
   status         String                     @default("pending")
   createdAt      DateTime                   @default(now())
   updatedAt      DateTime                   @updatedAt

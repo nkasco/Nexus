@@ -25,6 +25,7 @@ function createIntegrationRecord(
     provider: 'proxmox',
     displayName: 'Proxmox',
     enabled: true,
+    pollingIntervalSeconds: null,
     status: 'pending',
     createdAt: new Date('2026-03-21T18:00:00.000Z'),
     updatedAt: new Date('2026-03-21T18:00:00.000Z'),
@@ -194,6 +195,122 @@ describe('IntegrationsService', () => {
         title: 'Proxmox sync complete',
         severity: 'success',
         source: 'integration',
+      }),
+    );
+  });
+
+  it('updates provider configuration with polling overrides and editable credentials', async () => {
+    const updatedRecord = createIntegrationRecord({
+      enabled: false,
+      pollingIntervalSeconds: 120,
+      status: 'disabled',
+      syncState: {
+        id: 'sync-1',
+        integrationId: 'integration-1',
+        status: 'disabled',
+        lastStartedAt: null,
+        lastCompletedAt: null,
+        lastSuccessAt: null,
+        lastError: null,
+        consecutiveFailures: 0,
+        durationMs: null,
+        assetCount: 0,
+        metricCount: 0,
+        summaryJson: null,
+        createdAt: new Date('2026-03-21T18:00:00.000Z'),
+        updatedAt: new Date('2026-03-21T18:00:00.000Z'),
+      },
+      credentialRefs: [
+        {
+          id: 'credential-1',
+          integrationId: 'integration-1',
+          key: 'baseUrl',
+          label: 'Cluster API URL',
+          value: 'https://pve.example.com',
+          sensitive: false,
+          createdAt: new Date('2026-03-21T18:00:00.000Z'),
+          updatedAt: new Date('2026-03-21T18:05:00.000Z'),
+        },
+      ],
+    });
+
+    const prisma = {
+      integration: {
+        upsert: vi.fn().mockResolvedValue({
+          id: 'integration-1',
+          enabled: true,
+        }),
+        update: vi.fn().mockResolvedValue({}),
+        findUniqueOrThrow: vi
+          .fn()
+          .mockResolvedValueOnce(createIntegrationRecord())
+          .mockResolvedValueOnce(updatedRecord),
+        findMany: vi.fn().mockResolvedValue([
+          {
+            provider: 'proxmox',
+            enabled: false,
+            pollingIntervalSeconds: 120,
+          },
+        ]),
+      },
+      integrationSyncState: {
+        upsert: vi.fn().mockResolvedValue({}),
+      },
+      integrationCredentialRef: {
+        upsert: vi.fn().mockResolvedValue({}),
+      },
+    };
+    const notificationsService = {
+      record: vi.fn(),
+    };
+
+    const service = new IntegrationsService(
+      prisma as never,
+      { broadcast: vi.fn() } as never,
+      notificationsService as never,
+    );
+
+    const detail = await service.updateConfiguration('proxmox', {
+      enabled: false,
+      pollingIntervalSeconds: 120,
+      credentialValues: {
+        baseUrl: 'https://pve.example.com',
+      },
+    });
+
+    expect(prisma.integration.update.mock.calls[0]?.[0]).toMatchObject({
+      data: {
+        enabled: false,
+        pollingIntervalSeconds: 120,
+        status: 'disabled',
+      },
+    });
+    expect(
+      prisma.integrationCredentialRef.upsert.mock.calls.some(([call]) => {
+        const input = call as {
+          where: { integrationId_key: { key: string } };
+          update: { value: string };
+        };
+
+        return (
+          input.where.integrationId_key.key === 'baseUrl' &&
+          input.update.value === 'https://pve.example.com'
+        );
+      }),
+    ).toBe(true);
+    expect(detail.integration.enabled).toBe(false);
+    expect(detail.integration.pollingIntervalSeconds).toBe(120);
+    expect(detail.credentials[0]).toEqual(
+      expect.objectContaining({
+        key: 'baseUrl',
+        envVar: 'PROXMOX_BASE_URL',
+        editable: true,
+        source: 'stored',
+      }),
+    );
+    expect(notificationsService.record).toHaveBeenCalledWith(
+      expect.objectContaining({
+        title: 'Proxmox settings saved',
       }),
     );
   });

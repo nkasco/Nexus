@@ -27,6 +27,7 @@ interface AppShellProps {
   unreadCount: number;
   isNotificationCenterOpen: boolean;
   websocketStatus: 'connecting' | 'connected' | 'disconnected';
+  use24HourTime: boolean;
   health: HealthResponse | null;
   lastEventAt: string | null;
   isSaving: boolean;
@@ -122,7 +123,7 @@ function widgetSpanClass(widget: WidgetView, compactMode: boolean) {
   return 'col-span-12 md:col-span-6 xl:col-span-3';
 }
 
-function lastEventLabel(lastEventAt: string | null) {
+function lastEventLabel(lastEventAt: string | null, use24HourTime: boolean) {
   if (!lastEventAt) {
     return 'Awaiting first pulse';
   }
@@ -130,6 +131,7 @@ function lastEventLabel(lastEventAt: string | null) {
   return new Date(lastEventAt).toLocaleTimeString([], {
     hour: 'numeric',
     minute: '2-digit',
+    hour12: !use24HourTime,
   });
 }
 
@@ -207,6 +209,7 @@ export function AppShell({
   unreadCount,
   isNotificationCenterOpen,
   websocketStatus,
+  use24HourTime,
   health,
   lastEventAt,
   isSaving,
@@ -370,6 +373,22 @@ export function AppShell({
                 ↩
               </span>
             </button>
+
+            <Link
+              className="mt-2 flex h-11 w-full items-center justify-center rounded-[12px] border border-[color:var(--border-soft)] bg-[color:var(--panel-subtle)] text-sm font-medium text-[color:var(--text-subtle)] transition hover:border-[color:var(--border-strong)] hover:bg-[color:var(--panel-muted)] hover:text-[color:var(--text-main)]"
+              href="/settings"
+            >
+              <span
+                className={clsx(preferences.sidebarCollapsed && 'lg:hidden')}
+              >
+                Settings
+              </span>
+              <span
+                className={clsx(!preferences.sidebarCollapsed && 'lg:hidden')}
+              >
+                ⚙
+              </span>
+            </Link>
           </div>
         </aside>
 
@@ -426,7 +445,7 @@ export function AppShell({
                     <span className="eyebrow-label">Last event</span>
                   </span>
                   <span className="mt-2 block text-sm font-medium text-[color:var(--text-main)]">
-                    {lastEventLabel(lastEventAt)}
+                    {lastEventLabel(lastEventAt, use24HourTime)}
                   </span>
                 </div>
 

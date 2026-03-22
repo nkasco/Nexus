@@ -41,8 +41,11 @@ export interface IntegrationCredentialRef {
   key: string;
   label: string;
   value: string;
+  envVar: string;
   sensitive: boolean;
+  editable: boolean;
   configured: boolean;
+  source: 'stored' | 'environment' | 'missing';
 }
 
 export interface IntegrationActionDefinition {
@@ -83,6 +86,12 @@ export interface IntegrationSummary {
   highlights: string[];
   syncState: IntegrationSyncState;
   assetsByType: AssetTypeSummary[];
+}
+
+export interface UpdateIntegrationConfigurationRequest {
+  enabled?: boolean;
+  pollingIntervalSeconds?: number;
+  credentialValues?: Record<string, string>;
 }
 
 export interface IntegrationAsset {

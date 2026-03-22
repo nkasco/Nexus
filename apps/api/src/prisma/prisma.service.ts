@@ -15,6 +15,7 @@ const SQLITE_BOOTSTRAP_STATEMENTS = [
     "provider" TEXT NOT NULL,
     "displayName" TEXT NOT NULL,
     "enabled" BOOLEAN NOT NULL DEFAULT true,
+    "pollingIntervalSeconds" INTEGER,
     "status" TEXT NOT NULL DEFAULT 'pending',
     "createdAt" DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updatedAt" DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP
@@ -133,6 +134,30 @@ export class PrismaService
       SQLITE_BOOTSTRAP_STATEMENTS.map((statement) =>
         this.$executeRawUnsafe(statement),
       ),
+    );
+
+    await this.ensureSqliteColumn(
+      'Integration',
+      'pollingIntervalSeconds',
+      'INTEGER',
+    );
+  }
+
+  private async ensureSqliteColumn(
+    table: string,
+    column: string,
+    definition: string,
+  ) {
+    const columns = await this.$queryRawUnsafe<Array<{ name?: string }>>(
+      `PRAGMA table_info("${table}")`,
+    );
+
+    if (columns.some((entry) => entry.name === column)) {
+      return;
+    }
+
+    await this.$executeRawUnsafe(
+      `ALTER TABLE "${table}" ADD COLUMN "${column}" ${definition}`,
     );
   }
 }

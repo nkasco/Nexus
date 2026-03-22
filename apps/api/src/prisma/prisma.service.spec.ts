@@ -8,15 +8,18 @@ describe('PrismaService', () => {
       return [];
     });
     const connect = vi.fn().mockResolvedValue(undefined);
+    const queryRaw = vi.fn().mockResolvedValue([{ name: 'id' }]);
 
     const service = Object.create(PrismaService.prototype) as PrismaService & {
       $connect: ReturnType<typeof vi.fn>;
       $executeRawUnsafe: ReturnType<typeof vi.fn>;
+      $queryRawUnsafe: ReturnType<typeof vi.fn>;
       $transaction: ReturnType<typeof vi.fn>;
     };
 
     service.$connect = connect;
     service.$executeRawUnsafe = execute;
+    service.$queryRawUnsafe = queryRaw;
     service.$transaction = transaction;
 
     await service.onModuleInit();
@@ -28,6 +31,14 @@ describe('PrismaService', () => {
     );
     expect(execute).toHaveBeenCalledWith(
       expect.stringContaining('CREATE TABLE IF NOT EXISTS "Dashboard"'),
+    );
+    expect(queryRaw).toHaveBeenCalledWith(
+      'PRAGMA table_info("Integration")',
+    );
+    expect(execute).toHaveBeenCalledWith(
+      expect.stringContaining(
+        'ALTER TABLE "Integration" ADD COLUMN "pollingIntervalSeconds" INTEGER',
+      ),
     );
   });
 });

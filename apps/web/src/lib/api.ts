@@ -8,7 +8,12 @@ import type {
   IntegrationsOverviewResponse,
   LoginRequest,
   NotificationListResponse,
+  NotificationSettings,
+  OperatorPreferences,
+  SettingsOverviewResponse,
   UiPreferences,
+  UpdateIntegrationConfigurationRequest,
+  UpdateNotificationSettingsRequest,
 } from '@nexus/shared';
 import type { SessionResponse } from '@nexus/shared';
 
@@ -66,10 +71,34 @@ export const api = {
     }),
   getSession: (token: string) =>
     request<SessionResponse>('/auth/session', { token }),
+  getSettingsOverview: (token: string) =>
+    request<SettingsOverviewResponse>('/settings', { token }),
   getPreferences: (token: string) =>
     request<UiPreferences>('/settings/ui', { token }),
   updatePreferences: (token: string, updates: Partial<UiPreferences>) =>
     request<UiPreferences>('/settings/ui', {
+      method: 'PATCH',
+      token,
+      body: updates,
+    }),
+  getOperatorPreferences: (token: string) =>
+    request<OperatorPreferences>('/settings/operator', { token }),
+  updateOperatorPreferences: (
+    token: string,
+    updates: Partial<OperatorPreferences>,
+  ) =>
+    request<OperatorPreferences>('/settings/operator', {
+      method: 'PATCH',
+      token,
+      body: updates,
+    }),
+  getNotificationSettings: (token: string) =>
+    request<NotificationSettings>('/settings/notifications', { token }),
+  updateNotificationSettings: (
+    token: string,
+    updates: UpdateNotificationSettingsRequest,
+  ) =>
+    request<NotificationSettings>('/settings/notifications', {
       method: 'PATCH',
       token,
       body: updates,
@@ -97,6 +126,16 @@ export const api = {
     request<IntegrationsOverviewResponse>('/integrations', { token }),
   getIntegrationDetail: (token: string, provider: IntegrationProvider) =>
     request<IntegrationDetailResponse>(`/integrations/${provider}`, { token }),
+  updateIntegrationConfiguration: (
+    token: string,
+    provider: IntegrationProvider,
+    updates: UpdateIntegrationConfigurationRequest,
+  ) =>
+    request<IntegrationDetailResponse>(`/integrations/${provider}/config`, {
+      method: 'PATCH',
+      token,
+      body: updates,
+    }),
   syncIntegrations: (token: string) =>
     request<IntegrationsOverviewResponse>('/integrations/sync', {
       method: 'POST',

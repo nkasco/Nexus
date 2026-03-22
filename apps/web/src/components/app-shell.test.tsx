@@ -73,6 +73,7 @@ describe('AppShell', () => {
         section="overview"
         unreadCount={1}
         userName="Primary Operator"
+        use24HourTime={false}
         websocketStatus="connected"
         widgets={[
           {
@@ -126,6 +127,10 @@ describe('AppShell', () => {
     expect(
       screen.getByRole('button', { name: 'Collapse sidebar' }),
     ).toBeInTheDocument();
+    expect(screen.getByRole('link', { name: /Settings/ })).toHaveAttribute(
+      'href',
+      '/settings',
+    );
     expect(getByTestId('app-sidebar')).toHaveClass(
       'lg:w-[292px]',
       'pl-0',

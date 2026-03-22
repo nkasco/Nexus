@@ -234,22 +234,37 @@ This file should be updated after implementation work so completed items, remain
 
 ### Deliverables
 
-- [ ] Audit all required configuration surfaces across authentication, appearance, dashboards, integrations, notifications, polling/sync behavior, and other operator-managed platform settings
-- [ ] Document which settings are intentionally deployment-time or environment-only versus which must be editable in the Nexus UI
-- [ ] Confirm whether the current Phase 1 settings implementation already covers any required areas and explicitly note any gaps that still need UI support
-- [ ] Add or expand a dedicated settings panel or settings routes for all in-app managed configuration domains
-- [ ] Add integration configuration management for enabling/disabling providers, editing non-secret connection details, and clearly handling credential requirements
-- [ ] Add UI flows for managing notification-related configuration that is required before Phase 5 alert delivery can be considered complete
-- [ ] Add dashboard and operator preference controls for any remaining required personalization or default behavior not already covered by the existing settings model
-- [ ] Add guardrails, validation, help text, and empty/error states so operators can understand what is configurable in-app versus elsewhere
-- [ ] Update backend/frontend contracts and persistence models as needed to support newly surfaced settings domains
-- [ ] Add or update unit tests covering the settings panel state, validation, and persistence behavior for each newly introduced configuration workflow
+- [x] Audit all required configuration surfaces across authentication, appearance, dashboards, integrations, notifications, polling/sync behavior, and other operator-managed platform settings
+- [x] Document which settings are intentionally deployment-time or environment-only versus which must be editable in the Nexus UI
+- [x] Confirm whether the current Phase 1 settings implementation already covers any required areas and explicitly note any gaps that still need UI support
+- [x] Add or expand a dedicated settings panel or settings routes for all in-app managed configuration domains
+- [x] Add integration configuration management for enabling/disabling providers, editing non-secret connection details, and clearly handling credential requirements
+- [x] Add UI flows for managing notification-related configuration that is required before Phase 5 alert delivery can be considered complete
+- [x] Add dashboard and operator preference controls for any remaining required personalization or default behavior not already covered by the existing settings model
+- [x] Add guardrails, validation, help text, and empty/error states so operators can understand what is configurable in-app versus elsewhere
+- [x] Update backend/frontend contracts and persistence models as needed to support newly surfaced settings domains
+- [x] Add or update unit tests covering the settings panel state, validation, and persistence behavior for each newly introduced configuration workflow
 
 ### Exit Criteria
 
-- [ ] Every required configuration item has a documented ownership path: in-app settings, deployment-time environment configuration, or intentionally deferred future work
-- [ ] Operators can reach a single clear settings experience for all configuration that Nexus expects them to manage through the product
-- [ ] Newly added settings flows persist correctly, handle invalid input safely, and communicate secret/configuration boundaries clearly
+- [x] Every required configuration item has a documented ownership path: in-app settings, deployment-time environment configuration, or intentionally deferred future work
+- [x] Operators can reach a single clear settings experience for all configuration that Nexus expects them to manage through the product
+- [x] Newly added settings flows persist correctly, handle invalid input safely, and communicate secret/configuration boundaries clearly
+
+### Phase 3.5 Notes
+
+- Phase 3.5 introduced a dedicated authenticated `/settings` route that centralizes appearance, operator behavior, notification readiness, and per-provider integration configuration instead of scattering those controls across header shortcuts alone.
+- The settings surface now includes an explicit configuration ownership audit that maps each required operator-facing setting to one of three states: managed in-app, intentionally environment-driven, or intentionally deferred to later phases.
+- Phase 1 coverage is now called out directly inside the settings audit: the original quick shell controls for theme, accent, compact mode, and sidebar state remain available, while the missing operator defaults and delivery-configuration workflows were added in this phase.
+- Operator preferences now persist a default landing page, auto-open notification behavior, and 24-hour time formatting, and the application root route now honors the saved default landing page from persisted operator preferences.
+- Integrations now support in-app enable or disable control, per-provider polling interval overrides, editable non-secret connection fields, and explicit env-only treatment for sensitive credentials until encrypted secret storage lands.
+- Notification readiness now has persisted in-app controls for channel enablement, minimum severity, default routing, and non-secret delivery metadata, while Discord, Telegram, and SMTP secrets remain clearly marked as environment-only.
+- Shared contracts, Prisma persistence, SQLite bootstrap behavior, API endpoints, and the dashboard shell were updated together so the settings UI, backend validation, and runtime sync behavior stay aligned.
+- Unit coverage now includes the new settings service domains, integration configuration updates, and the web settings workspace validation paths.
+- `npm run test`, `npm run typecheck`, `npm run lint`, and `npm run build` all completed successfully after the Phase 3.5 implementation.
+- Playwright validation confirmed the authenticated `/settings` route renders the new ownership audit, appearance controls, notification channel configuration, and integration management cards, and an operator preference save flow was exercised successfully in the rendered UI.
+- The pre-existing `apps/web/scripts/dev-server.mjs` port-resolution failure is still present, so browser validation again used the direct Next.js dev command instead of the wrapper script.
+- Follow-up work introduced by this phase includes encrypting secrets at rest before allowing in-app secret editing, adding test-send flows once notification delivery exists in Phase 5, and addressing the known web dev wrapper port bug separately from the settings surface itself.
 
 ## Phase 4: Historical Metrics, Graphs, and KPI Rollups
 
@@ -395,7 +410,7 @@ This file should be updated after implementation work so completed items, remain
 
 ## Recommended Delivery Sequence
 
-- [ ] Complete Phases 0 through 3.5 before enabling any write actions
+- [x] Complete Phases 0 through 3.5 before enabling any write actions
 - [ ] Complete Phase 4 before marketing historical insights as a primary feature
 - [ ] Complete Phase 5 before relying on Nexus for operational alerting
 - [ ] Complete Phase 6 before positioning Nexus as a true control plane

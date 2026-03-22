@@ -1,5 +1,6 @@
 import type { Prisma } from '@prisma/client';
 import {
+  BadRequestException,
   Injectable,
   NotFoundException,
   OnModuleDestroy,
@@ -17,6 +18,7 @@ import type {
   IntegrationSummary,
   JsonObject,
   JsonValue,
+  UpdateIntegrationConfigurationRequest,
 } from '@nexus/shared';
 import { NotificationsService } from '../notifications/notifications.service';
 import { PrismaService } from '../prisma/prisma.service';
@@ -48,6 +50,9 @@ const providerOrder: IntegrationProvider[] = [
   'github',
 ] as const;
 
+const MIN_POLLING_INTERVAL_SECONDS = 15;
+const MAX_POLLING_INTERVAL_SECONDS = 900;
+
 @Injectable()
 export class IntegrationsService implements OnModuleInit, OnModuleDestroy {
   private readonly adapters = new Map<IntegrationProvider, ProviderAdapter>(
@@ -64,7 +69,7 @@ export class IntegrationsService implements OnModuleInit, OnModuleDestroy {
   async onModuleInit() {
     await this.seedIntegrations();
     await this.syncAll('startup');
-    this.startPolling();
+    await this.startPolling();
   }
 
   onModuleDestroy() {
@@ -132,7 +137,7 @@ export class IntegrationsService implements OnModuleInit, OnModuleDestroy {
     return {
       integration: this.toSummary(integration),
       credentials: integration.credentialRefs.map((credential) =>
-        this.toCredentialRef(credential),
+        this.toCredentialRef(credential, adapter.credentials),
       ),
       actions: adapter.actions,
       assets: integration.assets
@@ -146,6 +151,113 @@ export class IntegrationsService implements OnModuleInit, OnModuleDestroy {
           this.toMetric(metric, integration.provider as IntegrationProvider),
         ),
     };
+  }
+
+  async updateConfiguration(
+    provider: string,
+    updates: UpdateIntegrationConfigurationRequest,
+  ): Promise<IntegrationDetailResponse> {
+    await this.seedIntegrations();
+
+    const integration = await this.findIntegration(provider);
+    const typedProvider = integration.provider as IntegrationProvider;
+    const adapter = this.getAdapter(typedProvider);
+    const editableCredentials = new Map(
+      adapter.credentials
+        .filter((credential) => !credential.sensitive)
+        .map((credential) => [credential.key, credential] as const),
+    );
+
+    const integrationUpdate: {
+      enabled?: boolean;
+      pollingIntervalSeconds?: number | null;
+      status?: string;
+    } = {};
+
+    if (updates.enabled !== undefined) {
+      if (typeof updates.enabled !== 'boolean') {
+        throw new BadRequestException('enabled must be a boolean value.');
+      }
+
+      integrationUpdate.enabled = updates.enabled;
+      integrationUpdate.status = updates.enabled ? 'pending' : 'disabled';
+    }
+
+    if (updates.pollingIntervalSeconds !== undefined) {
+      integrationUpdate.pollingIntervalSeconds =
+        this.validatePollingInterval(updates.pollingIntervalSeconds);
+    }
+
+    if (Object.keys(integrationUpdate).length > 0) {
+      await this.prisma.integration.update({
+        where: { provider: typedProvider },
+        data: integrationUpdate,
+      });
+    }
+
+    if (updates.credentialValues) {
+      await Promise.all(
+        Object.entries(updates.credentialValues).map(([key, rawValue]) => {
+          const definition = editableCredentials.get(key);
+
+          if (!definition) {
+            throw new BadRequestException(
+              `${key} cannot be edited in-app for ${adapter.displayName}.`,
+            );
+          }
+
+          const value = rawValue.trim();
+
+          return this.prisma.integrationCredentialRef.upsert({
+            where: {
+              integrationId_key: {
+                integrationId: integration.id,
+                key,
+              },
+            },
+            create: {
+              integrationId: integration.id,
+              key,
+              label: definition.label,
+              value: value.length > 0 ? value : `env:${definition.envVar}`,
+              sensitive: false,
+            },
+            update: {
+              label: definition.label,
+              value: value.length > 0 ? value : `env:${definition.envVar}`,
+              sensitive: false,
+            },
+          });
+        }),
+      );
+    }
+
+    await this.prisma.integrationSyncState.upsert({
+      where: { integrationId: integration.id },
+      create: {
+        integrationId: integration.id,
+        status: integrationUpdate.enabled === false ? 'disabled' : 'pending',
+      },
+      update:
+        integrationUpdate.enabled === false
+          ? {
+              status: 'disabled',
+            }
+          : {},
+    });
+
+    await this.startPolling();
+
+    this.notificationsService.record({
+      title: `${adapter.displayName} settings saved`,
+      message: `${adapter.displayName} is ${
+        integrationUpdate.enabled === false ? 'disabled' : 'ready to sync'
+      }.`,
+      severity: 'info',
+      source: 'integration',
+    });
+
+    return this.getIntegration(typedProvider);
   }
 
   async syncAll(
@@ -420,14 +532,35 @@ export class IntegrationsService implements OnModuleInit, OnModuleDestroy {
     }
   }
 
-  private startPolling() {
+  private async startPolling() {
     this.pollTimers.forEach((timer) => clearInterval(timer));
     this.pollTimers.clear();
 
+    const integrations = await this.prisma.integration.findMany({
+      select: {
+        provider: true,
+        enabled: true,
+        pollingIntervalSeconds: true,
+      },
+    });
+    const integrationByProvider = new Map(
+      integrations.map((integration) => [integration.provider, integration] as const),
+    );
+
     providerAdapters.forEach((adapter) => {
+      const integration = integrationByProvider.get(adapter.provider);
+
+      if (integration && !integration.enabled) {
+        return;
+      }
+
+      const intervalSeconds = this.resolvePollingInterval(
+        integration?.pollingIntervalSeconds ?? null,
+        adapter.syncIntervalSeconds,
+      );
       const timer = setInterval(() => {
         void this.syncProvider(adapter.provider, 'schedule');
-      }, adapter.syncIntervalSeconds * 1000);
+      }, intervalSeconds * 1000);
 
       this.pollTimers.set(adapter.provider, timer);
     });
@@ -700,7 +833,10 @@ export class IntegrationsService implements OnModuleInit, OnModuleDestroy {
       enabled: integration.enabled,
       status: (integration.syncState?.status ??
         integration.status) as IntegrationStatus,
-      pollingIntervalSeconds: adapter.syncIntervalSeconds,
+      pollingIntervalSeconds: this.resolvePollingInterval(
+        integration.pollingIntervalSeconds,
+        adapter.syncIntervalSeconds,
+      ),
       headline:
         summary?.headline ??
         `${integration.assets.length} assets and ${integration.currentMetrics.length} metrics normalized.`,
@@ -768,14 +904,65 @@ export class IntegrationsService implements OnModuleInit, OnModuleDestroy {
     label: string;
     value: string;
     sensitive: boolean;
-  }): IntegrationCredentialRef {
+  }, definitions: ProviderCredentialDefinition[]): IntegrationCredentialRef {
+    const definition = definitions.find((item) => item.key === credential.key);
+    const source = this.credentialValueSource(credential.value);
+
     return {
       key: credential.key,
       label: credential.label,
-      value: credential.value,
+      value: source === 'stored' ? credential.value : '',
+      envVar: definition?.envVar ?? '',
       sensitive: credential.sensitive,
+      editable: Boolean(definition && !definition.sensitive),
       configured: Boolean(this.resolveCredentialValue(credential.value)),
+      source,
     };
+  }
+
+  private validatePollingInterval(value: unknown) {
+    if (!Number.isInteger(value)) {
+      throw new BadRequestException(
+        'pollingIntervalSeconds must be an integer value.',
+      );
+    }
+
+    if (
+      (value as number) < MIN_POLLING_INTERVAL_SECONDS ||
+      (value as number) > MAX_POLLING_INTERVAL_SECONDS
+    ) {
+      throw new BadRequestException(
+        `pollingIntervalSeconds must stay between ${MIN_POLLING_INTERVAL_SECONDS} and ${MAX_POLLING_INTERVAL_SECONDS}.`,
+      );
+    }
+
+    return value as number;
+  }
+
+  private resolvePollingInterval(
+    override: number | null | undefined,
+    fallback: number,
+  ) {
+    if (!override) {
+      return fallback;
+    }
+
+    return Math.min(
+      Math.max(override, MIN_POLLING_INTERVAL_SECONDS),
+      MAX_POLLING_INTERVAL_SECONDS,
+    );
+  }
+
+  private credentialValueSource(value: string) {
+    if (value.trim().length === 0) {
+      return 'missing' as const;
+    }
+
+    if (value.startsWith('env:')) {
+      return 'environment' as const;
+    }
+
+    return 'stored' as const;
   }
 
   private toAsset(asset: {

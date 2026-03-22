@@ -1,7 +1,8 @@
-import { Controller, Get, Param, Post, UseGuards } from '@nestjs/common';
+import { Body, Controller, Get, Param, Patch, Post, UseGuards } from '@nestjs/common';
 import type {
   IntegrationDetailResponse,
   IntegrationsOverviewResponse,
+  UpdateIntegrationConfigurationRequest,
 } from '@nexus/shared';
 import { AuthGuard } from '../auth/auth.guard';
 import { IntegrationsService } from './integrations.service';
@@ -12,6 +13,8 @@ export class IntegrationsController {
   constructor(private readonly integrationsService: IntegrationsService) {
     this.getIntegrations = this.getIntegrations.bind(this);
     this.getIntegration = this.getIntegration.bind(this);
+    this.updateIntegrationConfiguration =
+      this.updateIntegrationConfiguration.bind(this);
     this.syncAll = this.syncAll.bind(this);
     this.syncIntegration = this.syncIntegration.bind(this);
   }
@@ -26,6 +29,14 @@ export class IntegrationsController {
     @Param('provider') provider: string,
   ): Promise<IntegrationDetailResponse> {
     return this.integrationsService.getIntegration(provider);
+  }
+
+  @Patch(':provider/config')
+  updateIntegrationConfiguration(
+    @Param('provider') provider: string,
+    @Body() updates: UpdateIntegrationConfigurationRequest,
+  ): Promise<IntegrationDetailResponse> {
+    return this.integrationsService.updateConfiguration(provider, updates);
   }
 
   @Post('sync')

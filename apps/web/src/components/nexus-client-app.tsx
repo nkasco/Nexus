@@ -11,14 +11,15 @@ import type {
   RealtimeEvent,
   UiPreferences,
 } from '@nexus/shared';
-import { integrationProviders } from '@nexus/shared';
 import { startTransition, useEffect, useState } from 'react';
 import { api, getWebSocketUrl } from '../lib/api';
 import {
   buildWidgetViews,
   createPresetLayout,
 } from '../lib/dashboard-sections';
+import { integrationProviderOrder } from '../lib/integration-providers';
 import { useNotificationsStore } from '../lib/stores/notifications-store';
+import { useOperatorPreferencesStore } from '../lib/stores/operator-preferences-store';
 import { usePreferencesStore } from '../lib/stores/preferences-store';
 import { useSessionStore } from '../lib/stores/session-store';
 import { AppShell } from './app-shell';
@@ -39,7 +40,7 @@ function toDetailMap(
 async function loadIntegrationData(activeToken: string) {
   const [overview, ...details] = await Promise.all([
     api.getIntegrations(activeToken),
-    ...integrationProviders.map((provider) =>
+    ...integrationProviderOrder.map((provider) =>
       api.getIntegrationDetail(activeToken, provider),
     ),
   ]);
@@ -67,6 +68,11 @@ export function NexusClientApp({ section }: NexusClientAppProps) {
     replace: replaceNotifications,
     unreadCount,
   } = useNotificationsStore();
+  const {
+    autoOpenNotifications,
+    hydrate: hydrateOperatorPreferences,
+    use24HourTime,
+  } = useOperatorPreferencesStore();
   const [dashboard, setDashboard] = useState<DashboardResponse | null>(null);
   const [health, setHealth] = useState<HealthResponse | null>(null);
   const [integrationsOverview, setIntegrationsOverview] =
@@ -189,12 +195,14 @@ export function NexusClientApp({ section }: NexusClientAppProps) {
         const [
           session,
           nextPreferences,
+          nextOperatorPreferences,
           nextDashboard,
           nextNotifications,
           integrationData,
         ] = await Promise.all([
           api.getSession(token),
           api.getPreferences(token),
+          api.getOperatorPreferences(token),
           api.getDashboard(token, section),
           api.getNotifications(token),
           loadIntegrationData(token),
@@ -202,6 +210,7 @@ export function NexusClientApp({ section }: NexusClientAppProps) {
 
         startTransition(() => {
           hydratePreferences(nextPreferences);
+          hydrateOperatorPreferences(nextOperatorPreferences);
           replaceNotifications(
             nextNotifications.items,
             nextNotifications.unreadCount,
@@ -231,6 +240,7 @@ export function NexusClientApp({ section }: NexusClientAppProps) {
     void bootstrap();
   }, [
     clearSession,
+    hydrateOperatorPreferences,
     hydratePreferences,
     replaceNotifications,
     section,
@@ -265,6 +275,9 @@ export function NexusClientApp({ section }: NexusClientAppProps) {
 
       if (message.type === 'notification.created') {
         prepend(message.payload as NotificationItem);
+        if (autoOpenNotifications) {
+          setIsNotificationCenterOpen(true);
+        }
       }
 
       if (message.type === 'settings.updated') {
@@ -295,7 +308,13 @@ export function NexusClientApp({ section }: NexusClientAppProps) {
     return () => {
       socket.close();
     };
-  }, [hydratePreferences, prepend, section, token]);
+  }, [
+    autoOpenNotifications,
+    hydratePreferences,
+    prepend,
+    section,
+    token,
+  ]);
 
   if (!token || !user) {
     return (
@@ -462,6 +481,7 @@ export function NexusClientApp({ section }: NexusClientAppProps) {
         section={section}
         unreadCount={unreadCount}
         userName={user.displayName}
+        use24HourTime={use24HourTime}
         websocketStatus={websocketStatus}
         refreshingWidgetIds={refreshingWidgetIds}
         widgets={buildWidgetViews(

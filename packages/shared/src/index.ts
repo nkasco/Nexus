@@ -43,6 +43,7 @@ export type {
   JsonObject,
   JsonValue,
   MetricSnapshotStatus,
+  UpdateIntegrationConfigurationRequest,
 } from './contracts/integrations';
 export type {
   AssetUpdatePayload,
@@ -56,6 +57,18 @@ export type {
 } from './contracts/realtime';
 export type {
   AccentPreference,
+  ConfigurationAuditItem,
+  NotificationChannel,
+  NotificationChannelField,
+  NotificationChannelSettings,
+  NotificationMinimumSeverity,
+  NotificationSettings,
+  OperatorPreferences,
+  SettingsDomain,
+  SettingsOverviewResponse,
+  SettingsOwnership,
+  SettingsValueSource,
   ThemePreference,
   UiPreferences,
+  UpdateNotificationSettingsRequest,
 } from './contracts/settings';
