@@ -219,11 +219,12 @@ The current shell is coherent, but the live audit showed an oversized presentati
 ### Phase 4 Notes
 
 - The current live audit surfaced the existing `favicon.ico` 404 in the Next.js dev environment; it is unrelated to the visual overhaul but may continue to appear during browser validation until fixed separately.
-- Phase 4 added another shell regression assertion in `apps/web/src/components/app-shell.test.tsx` so the collapsed-sidebar plus compact-layout state remains covered alongside the earlier widget and settings tests.
+- Phase 4 added another shell regression assertion in `apps/web/src/components/app-shell.test.tsx` so the collapsed-sidebar plus compact-layout state remains covered alongside the earlier widget and settings tests, and it added login-form regression coverage in `apps/web/src/components/login-panel.test.tsx` for native credential semantics plus submit or error states.
+- The login form now exposes explicit username or password autocomplete semantics and required fields in `apps/web/src/components/login-panel.tsx`, which keeps the rendered route aligned with native browser expectations and strengthens browser-driven validation.
 - Final validation passed `npm run test --workspace @nexus/web`, `npm run typecheck --workspace @nexus/web`, `npm run lint --workspace @nexus/web`, and `npm run build --workspace @nexus/web` after the Phase 4 follow-through work. The build still emits the existing Next.js ESLint-plugin warning, but it does not fail.
-- Playwright review against the built API on `4000` and the built web app on `3000` now covers the login route, `/overview`, `/media`, `/settings`, and a `390x844` mobile overview viewport. The sweep also exercised layout preset changes, theme switching, the collapsed sidebar state, and notification-center rendering in the overhauled shell.
+- Playwright review against the built API on `4000` and the built web app on `3000` now covers the login route, `/overview`, `/media`, `/settings`, and a `390x844` mobile overview viewport. The sweep also exercised visible-form login with `admin` / `nexus-admin`, layout preset changes, theme switching in both directions, the collapsed sidebar state, and notification-center rendering in the overhauled shell.
 - The mobile overview pass still keeps the first widget inside the opening viewport, with the `Compute Status` heading landing at roughly `698px` from the top of a `390x844` viewport during the final check.
-- One browser-path quirk remains: direct API login from Playwright succeeds, but submitting the visible login form still returns `Invalid credentials` during automation. The login route itself renders correctly, so Phase 4 can close, but dedicated end-to-end coverage should revisit the form-submission path specifically.
+- The remaining follow-up from this phase is narrower now: the development-time `favicon.ico` 404 still appears during some browser loads, `npm run build --workspace @nexus/web` still emits the existing non-failing Next.js ESLint-plugin warning, and broader end-to-end smoke coverage is still needed for authenticated restore and route rendering.
 
 ## Cross-Phase Testing Strategy
 

@@ -371,7 +371,7 @@ This file should be updated after implementation work so completed items, remain
 - `npm run test --workspace @nexus/web`, `npm run typecheck --workspace @nexus/web`, `npm run lint --workspace @nexus/web`, and `npm run build --workspace @nexus/web` all passed after the Phase 3 work. The build still emits the existing Next.js ESLint-plugin warning, but it does not fail.
 - Playwright validation against the built API on port `4000` and the built web app on port `3000` now covers the login route, `/overview`, `/media`, and `/settings`, plus a `390x844` mobile overview pass that still keeps the first widget visible in the opening viewport.
 - The same browser sweep exercised light and dark theme rendering, layout preset changes, the collapsed-sidebar state, and notification-center rendering in the overhauled shell.
-- The remaining follow-up from this phase is now narrower: the visible login form still returns `Invalid credentials` during Playwright automation even though direct API login succeeds, the development-time `favicon.ico` 404 is still present, and broader end-to-end coverage is still needed for authenticated restore and route rendering.
+- The remaining follow-up from this phase is now narrower: the development-time `favicon.ico` 404 is still present, the web build still emits the existing non-failing Next.js ESLint-plugin warning, and broader end-to-end coverage is still needed for authenticated restore and route rendering.
 
 ## Phase 3.6: UI Overhaul and Interaction Polish
 
@@ -426,6 +426,30 @@ This file should be updated after implementation work so completed items, remain
 - The Playwright dev-session console still showed the existing `favicon.ico` 404 in the Next.js development environment.
 - `npm run build --workspace @nexus/web` completed successfully but still emitted the existing Next.js warning that the Next ESLint plugin was not detected in the current ESLint configuration.
 - Follow-up work introduced by this phase includes adding dedicated end-to-end coverage for the login and dashboard flow, addressing the development-only `favicon.ico` 404, and reconciling the current ESLint setup with Next.js plugin detection expectations.
+
+## Phase 4: Validation, Regression Coverage, and Follow-Through
+
+### Deliverables
+
+- [x] Add or update unit tests for shell layout states, widget framing, and settings presentation changes
+- [x] Run `npm run test`, `npm run typecheck`, and `npm run lint`
+- [x] Use Playwright to review login, overview, media, settings, and a mobile viewport after implementation
+- [x] Record any remaining polish or follow-up items back into the planning artifacts
+- [x] Update `implementation_plan.md` to reflect overhaul progress and any follow-up work introduced by the redesign
+
+### Exit Criteria
+
+- [x] The revised shell is validated on desktop and mobile with Playwright
+- [x] Verification commands pass, or any remaining failures are documented explicitly
+
+### Notes
+
+- Phase 4 closed the visual-overhaul track with regression hardening in `apps/web/src/components/login-panel.tsx` and `apps/web/src/components/login-panel.test.tsx`, adding explicit native username or password autocomplete semantics, required fields, and test coverage for submission or error-state rendering.
+- Existing regression coverage for the overhauled shell, widget frame, and settings workspace remains in place through `apps/web/src/components/app-shell.test.tsx`, `apps/web/src/components/widget-frame.test.tsx`, and `apps/web/src/components/settings-workspace.test.tsx`, including the collapsed-sidebar plus compact-layout shell state.
+- `npm run test --workspace @nexus/web`, `npm run typecheck --workspace @nexus/web`, `npm run lint --workspace @nexus/web`, and `npm run build --workspace @nexus/web` all passed during the Phase 4 closeout on March 23, 2026. The web build still emits the existing non-failing Next.js ESLint-plugin warning.
+- Playwright validation against the built API on port `4000` and the built web app on port `3000` covered the visible login route, `/overview`, `/media`, `/settings`, and a `390x844` mobile overview pass. The sweep also exercised successful visible-form login with `admin` / `nexus-admin`, theme switching in both directions, layout preset changes, the collapsed-sidebar state, and notification-center rendering.
+- The final mobile overview pass still keeps the first widget inside the opening viewport, with the `Compute Status` heading landing at roughly `698px` from the top of a `390x844` viewport.
+- Remaining follow-up work from the visual-overhaul track is now limited to the intermittent development-time `favicon.ico` 404, the existing Next.js ESLint-plugin detection warning during web builds, and broader end-to-end smoke coverage for authenticated restore and route rendering.
 
 ## Phase 4: Historical Metrics, Graphs, and KPI Rollups
 

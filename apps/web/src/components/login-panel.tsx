@@ -125,9 +125,15 @@ export function LoginPanel({
                 Username
               </span>
               <input
+                autoCapitalize="none"
+                autoComplete="username"
+                autoCorrect="off"
                 className="shell-input"
+                id="login-username"
                 name="username"
                 onChange={(event) => setUsername(event.target.value)}
+                required
+                type="text"
                 value={username}
               />
             </label>
@@ -137,9 +143,12 @@ export function LoginPanel({
                 Password
               </span>
               <input
+                autoComplete="current-password"
                 className="shell-input"
+                id="login-password"
                 name="password"
                 onChange={(event) => setPassword(event.target.value)}
+                required
                 type="password"
                 value={password}
               />

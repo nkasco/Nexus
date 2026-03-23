@@ -32,4 +32,27 @@ describe('LoginPanel', () => {
 
     expect(screen.getByText('Enter the dashboard')).toBeInTheDocument();
   });
+
+  it('exposes native login semantics and surfaces submission or error state', () => {
+    render(
+      <LoginPanel
+        apiHealthy={false}
+        errorMessage="Invalid credentials"
+        isSubmitting
+        onSubmit={vi.fn()}
+      />,
+    );
+
+    expect(screen.getByLabelText('Username')).toHaveAttribute(
+      'autocomplete',
+      'username',
+    );
+    expect(screen.getByLabelText('Password')).toHaveAttribute(
+      'autocomplete',
+      'current-password',
+    );
+    expect(screen.getByRole('button', { name: 'Signing in...' })).toBeDisabled();
+    expect(screen.getByText('Invalid credentials')).toBeInTheDocument();
+    expect(screen.getByText('API unavailable')).toBeInTheDocument();
+  });
 });
